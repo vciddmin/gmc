@@ -40,7 +40,7 @@
   <div class="board">
     <header class="board-header">
       <h1>🤢 vomit.gmc</h1>
-      <span class="badge">анонимный имиджборд</span>
+      <span class="badge">#cryghanistan</span>
     </header>
 
     <section class="new-post-form">
@@ -121,19 +121,26 @@
     }
 
     // Загрузка начальных данных
-    async function loadPosts() {
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .order('created_at', { ascending: false });
+   async function loadPosts() {
+  console.log("Начинаю загрузку постов..."); // Проверка в консоли
+  
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .order('created_at', { ascending: false })
+    .abortSignal(AbortSignal.timeout(7000)); // Ждём максимум 7 секунд
 
-      if (error) {
-        console.error('Ошибка загрузки:', error);
-        feedEl.innerHTML = `<div class="empty-feed">Ошибка подключения к базе данных. Проверь ключи.</div>`;
-        return;
-      }
-      renderPosts(data);
-    }
+  if (error) {
+    console.error('ОШИБКА ЗАГРУЗКИ:', error);
+    // Показываем ошибку прямо на сайте
+    feedEl.innerHTML = `<div class="empty-feed">Ошибка: ${error.message}. Проверь консоль (F12).</div>`;
+    postCountEl.textContent = "Ошибка";
+    return;
+  }
+  
+  console.log("Данные получены:", data); // Проверка в консоли
+  renderPosts(data);
+}
 
     // Подписка на новые посты в реальном времени
     function subscribeToNewPosts() {
