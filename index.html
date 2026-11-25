@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <link rel="icon" type="image/x-icon" href="sigil.ico">
-  <link rel="apple-touch-icon" href="sigilAPPLE.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>vomit.gmc · анонимный имиджборд</title>
+  <title>vomit.gmc · #cryghanistan</title>
+  <!-- ИКОНКА САЙТА -->
+  <link rel="icon" type="image/x-icon" href="sigil.ico">
   <style>
     :root {
       --bg-body: #1a1b1e; --bg-board: #232428; --bg-sidebar: #1e1f22;
@@ -21,8 +21,6 @@
       transition: background 0.3s, color 0.3s; 
       background-size: cover; background-position: center; background-attachment: fixed;
     }
-    
-    /* Затемнение только для фона body, чтобы текст читался */
     body::before {
       content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.6); z-index: -1; backdrop-filter: blur(3px);
@@ -36,30 +34,16 @@
       z-index: 1; 
       opacity: var(--board-opacity); 
       position: relative;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      background-size: cover; background-position: center; background-repeat: no-repeat;
     }
-
-    /* Новый слой затемнения для фона самого борда */
     .app-container::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.4);
-      z-index: -1;
-      border-radius: inherit;
-      pointer-events: none;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4); z-index: -1; border-radius: inherit; pointer-events: none;
     }
-    
-    /* Всё содержимое борда поднимаем на слой выше */
-    .sidebar, .main-content {
-      position: relative;
-      z-index: 2;
-    }
+    .sidebar, .main-content { position: relative; z-index: 2; }
     
     /* Сайдбар */
-    .sidebar { width: 240px; background: var(--bg-sidebar); padding: 2rem 1rem; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.5rem; flex-shrink: 0; transition: background 0.3s; }
+    .sidebar { width: 240px; background: var(--bg-sidebar); padding: 2rem 1rem; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.5rem; flex-shrink: 0; }
     .sidebar-logo { font-size: 1.4rem; font-weight: 700; color: #f2f3f5; margin-bottom: 1.5rem; padding-left: 0.5rem; }
     .board-list { display: flex; flex-direction: column; gap: 0.3rem; overflow-y: auto; max-height: 60vh; }
     .board-btn { background: transparent; border: none; color: var(--text-muted); font-size: 0.95rem; font-weight: 500; text-align: left; padding: 0.7rem 1rem; border-radius: 10px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
@@ -70,10 +54,18 @@
 
     /* Контент */
     .main-content { flex: 1; padding: 2rem; display: flex; flex-direction: column; max-height: 100vh; overflow-y: auto; }
-    .header { border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
-    .header h1 { font-size: 1.6rem; font-weight: 600; }
     
-    /* Форма (остаётся непрозрачной) */
+    /* Шапка и Инструменты */
+    .header { border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .header-top h1 { font-size: 1.6rem; font-weight: 600; }
+    
+    .toolbar { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .search-input { flex: 1; min-width: 200px; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.6rem 1rem; border-radius: 8px; outline: none; }
+    .search-input:focus { border-color: var(--accent); }
+    .sort-select { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.6rem 1rem; border-radius: 8px; outline: none; cursor: pointer; }
+
+    /* Форма */
     .new-post-form { background: var(--bg-card); border-radius: var(--radius); padding: 1.2rem; margin-bottom: 2rem; border: 1px solid var(--border-color); }
     .form-row { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1rem; }
     .form-row input, .form-row textarea { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 10px; outline: none; }
@@ -83,7 +75,7 @@
     .btn-primary:hover { filter: brightness(0.9); }
     .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
 
-    /* Посты (остаются непрозрачными) */
+    /* Посты */
     .posts-feed { display: flex; flex-direction: column; gap: 1rem; }
     .post-node { display: flex; flex-direction: column; gap: 0.5rem; }
     .post-card { background: var(--bg-card); border-radius: var(--radius); padding: 1rem; border: 1px solid var(--border-color); }
@@ -91,29 +83,42 @@
     .post-author { background: var(--bg-input); padding: 0.2rem 0.6rem; border-radius: 20px; font-weight: 600; color: var(--text-main); }
     .post-date { margin-left: auto; }
     .post-text { font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap; word-break: break-word; margin-bottom: 0.5rem; }
-    .post-actions { display: flex; gap: 1rem; font-size: 0.8rem; color: var(--text-muted); }
-    .reply-btn { cursor: pointer; color: var(--accent); font-weight: 500; background: none; border: none; padding: 0; font-size: 0.8rem; }
+    
+    .post-actions { display: flex; align-items: center; gap: 1rem; font-size: 0.85rem; color: var(--text-muted); }
+    .reply-btn { cursor: pointer; color: var(--accent); font-weight: 500; background: none; border: none; padding: 0; font-size: 0.85rem; }
     .reply-btn:hover { text-decoration: underline; }
+    
+    /* РЕАКЦИИ */
+    .reactions { display: flex; gap: 0.5rem; margin-left: auto; }
+    .reaction-btn { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.2rem 0.6rem; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.85rem; transition: 0.2s; }
+    .reaction-btn:hover { border-color: var(--accent); }
+    .reaction-btn.liked { background: rgba(88, 101, 242, 0.2); border-color: var(--accent); color: var(--accent); }
+
     .children-container { margin-left: 1.5rem; padding-left: 1rem; border-left: 2px solid var(--border-color); display: flex; flex-direction: column; gap: 0.8rem; margin-top: 0.5rem; }
 
-    /* Модалка ответа */
+    /* Модалка */
     .reply-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
     .reply-modal.open { display: flex; }
     .modal-content { background: var(--bg-card); padding: 1.5rem; border-radius: var(--radius); width: 100%; max-width: 500px; border: 1px solid var(--border-color); }
     .modal-content h3 { margin-bottom: 1rem; font-size: 1.1rem; }
     .modal-textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 10px; min-height: 80px; margin-bottom: 1rem; resize: vertical; }
 
-    /* Настройки дизайна */
+    /* Настройки */
     .settings-toggle { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; }
     .settings-panel { position: fixed; top: 0; right: -350px; width: 320px; height: 100vh; background: var(--bg-sidebar); border-left: 1px solid var(--border-color); padding: 2rem 1.5rem; box-shadow: -5px 0 20px rgba(0,0,0,0.5); z-index: 1001; transition: right 0.3s; overflow-y: auto; }
     .settings-panel.open { right: 0; }
+    
+    .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .settings-header h2 { font-size: 1.3rem; color: var(--text-main); margin: 0; }
+    .close-settings { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; transition: color 0.2s; }
+    .close-settings:hover { color: #ed4245; }
+
     .setting-group { margin-bottom: 1.2rem; }
     .setting-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.3rem; }
     .setting-group input[type="color"], .setting-group input[type="file"], .setting-group input[type="range"], .setting-group select { width: 100%; padding: 0.4rem; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; }
     .setting-group input[type="color"] { height: 35px; cursor: pointer; }
     .setting-group input[type="file"] { font-size: 0.8rem; cursor: pointer; }
 
-    /* Адаптив */
     @media (max-width: 768px) {
       .app-container { flex-direction: column; }
       .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 1rem; border-right: none; border-bottom: 1px solid var(--border-color); align-items: center; }
@@ -122,6 +127,7 @@
       .board-btn { white-space: nowrap; padding: 0.5rem 1rem; }
       .add-board-btn { margin-top: 0; margin-left: 0.5rem; white-space: nowrap; }
       .main-content { padding: 1rem; }
+      .toolbar { flex-direction: column; }
     }
   </style>
 </head>
@@ -129,16 +135,25 @@
   <div class="app-container" id="appContainer">
     <aside class="sidebar">
       <div class="sidebar-logo"><span>🤢</span>vomit.gmc</div>
-      <div class="board-list" id="boardList">
-        <!-- Ветки загрузятся через JS -->
-      </div>
+      <div class="board-list" id="boardList"></div>
       <button class="add-board-btn" id="addBoardBtn">+ Создать ветку</button>
     </aside>
 
     <main class="main-content">
       <header class="header">
-        <h1 id="boardTitle">Загрузка...</h1>
-        <span id="postCount" style="color: var(--text-muted); font-size: 0.9rem;"></span>
+        <div class="header-top">
+          <h1 id="boardTitle">Загрузка...</h1>
+          <span id="postCount" style="color: var(--text-muted); font-size: 0.9rem;"></span>
+        </div>
+        <!-- ПАНЕЛЬ ПОИСКА И СОРТИРОВКИ -->
+        <div class="toolbar">
+          <input type="text" id="searchInput" class="search-input" placeholder="🔍 Поиск по сообщениям...">
+          <select id="sortSelect" class="sort-select">
+            <option value="newest">🕒 Сначала новые</option>
+            <option value="popular">🔥 Самые популярные</option>
+            <option value="liked">❤️ Самые залайканные</option>
+          </select>
+        </div>
       </header>
 
       <section class="new-post-form" id="newPostSection">
@@ -171,42 +186,38 @@
     </div>
   </div>
 
-  <!-- Кнопка и Панель настроек -->
+  <!-- Настройки -->
   <button class="settings-toggle" id="settingsToggle">⚙️</button>
   <div class="settings-panel" id="settingsPanel">
-    <h2>Настройки дизайна</h2>
+    <div class="settings-header">
+      <h2>Настройки дизайна</h2>
+      <button class="close-settings" id="closeSettings">×</button>
+    </div>
     
     <div class="setting-group">
       <label>Фон сайта (Картинка / Гифка)</label>
       <input type="file" id="bgImageInput" accept="image/*">
     </div>
-
-    <!-- НОВЫЙ ИНПУТ ДЛЯ ФОНА БОРДА -->
     <div class="setting-group">
       <label>Фон самого борда</label>
       <input type="file" id="boardBgInput" accept="image/*">
     </div>
-    
     <div class="setting-group">
       <label>Основной цвет</label>
       <input type="color" id="accentColor" value="#5865f2">
     </div>
-    
     <div class="setting-group">
       <label>Фон карточек</label>
       <input type="color" id="bgCard" value="#2b2d31">
     </div>
-    
     <div class="setting-group">
       <label>Цвет текста</label>
       <input type="color" id="textMain" value="#e3e5e8">
     </div>
-    
     <div class="setting-group">
       <label>Скругление углов (px)</label>
       <input type="range" id="radiusRange" min="0" max="30" value="16">
     </div>
-
     <div class="setting-group">
       <label>Прозрачность борда</label>
       <input type="range" id="opacityRange" min="0.1" max="1" step="0.05" value="0.95">
@@ -218,7 +229,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // =========================================================
-    // ⚠️ ВСТАВЬ СЮДА СВОЙ КЛЮЧ (Project Settings -> API -> Publishable key / anon)
+    // ⚠️ ВСТАВЬ СЮДА СВОЙ КЛЮЧ
     // =========================================================
     const SUPABASE_URL = 'https://ixeckrmjjwfaghcrmiep.supabase.co'; 
     const SUPABASE_ANON_KEY = 'sb_publishable_1gEN4w23ZxnYOosQ92_zGw_5oFocx6z'; // <--- ЗАМЕНИ ЭТО
@@ -231,6 +242,8 @@
     let allPosts = [];
     let allBoards = [];
     let replyToPostId = null;
+    let currentSearch = '';
+    let currentSort = 'newest';
 
     // DOM
     const boardListEl = document.getElementById('boardList');
@@ -244,6 +257,10 @@
     const replyModal = document.getElementById('replyModal');
     const replyText = document.getElementById('replyText');
     const appContainer = document.getElementById('appContainer');
+    
+    // Поиск и сортировка
+    const searchInput = document.getElementById('searchInput');
+    const sortSelect = document.getElementById('sortSelect');
 
     // --- Хелперы ---
     function escapeHTML(str) {
@@ -293,12 +310,9 @@
       if (!name) return;
       const cleanName = name.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
       if (!cleanName) return alert('Только буквы и цифры!');
-
       const icon = prompt('Введите эмодзи для ветки (например 🐱, 🚀, 🍕):') || '📁';
-
       const { error } = await client.from('boards').insert([{ name: cleanName, icon: icon }]);
       if (error) return alert('Ошибка: ' + error.message);
-      
       await loadBoards();
       const newBtn = document.querySelector(`.board-btn[data-board="${cleanName}"]`);
       if (newBtn) newBtn.click();
@@ -320,11 +334,27 @@
     }
 
     function renderPosts() {
-      const filtered = allPosts.filter(p => p.board === currentBoard);
+      let filtered = allPosts.filter(p => p.board === currentBoard);
+      
+      // ПРИМЕНЯЕМ ПОИСК
+      if (currentSearch) {
+        filtered = filtered.filter(p => p.text.toLowerCase().includes(currentSearch) || p.author.toLowerCase().includes(currentSearch));
+      }
+
+      // ПРИМЕНЯЕМ СОРТИРОВКУ
+      if (currentSort === 'popular') {
+        filtered.sort((a, b) => (b.likes - b.dislikes) - (a.likes - a.dislikes));
+      } else if (currentSort === 'liked') {
+        filtered.sort((a, b) => b.likes - a.likes);
+      } else {
+        // newest (по умолчанию) - по времени создания
+        filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+      }
+
       const tree = buildTree(filtered);
       
       if (tree.length === 0) {
-        feedEl.innerHTML = `<div class="empty-feed">✨ В ветке /${currentBoard}/ пока пусто. Напиши первым!</div>`;
+        feedEl.innerHTML = `<div class="empty-feed">✨ Ничего не найдено. Напиши первым!</div>`;
         postCountEl.textContent = `0 постов`;
         return;
       }
@@ -336,6 +366,12 @@
           ? `<div class="children-container">${node.children.map(renderNode).join('')}</div>` 
           : '';
         
+        // Проверяем, лайкал ли этот пользователь (храним в localStorage)
+        const likedPosts = JSON.parse(localStorage.getItem('vomit_liked') || '[]');
+        const dislikedPosts = JSON.parse(localStorage.getItem('vomit_disliked') || '[]');
+        const isLiked = likedPosts.includes(node.id) ? 'liked' : '';
+        const isDisliked = dislikedPosts.includes(node.id) ? 'liked' : '';
+
         return `
           <div class="post-node">
             <div class="post-card">
@@ -346,6 +382,15 @@
               <div class="post-text">${escapeHTML(node.text).replace(/\n/g, '<br>')}</div>
               <div class="post-actions">
                 <button class="reply-btn" data-id="${node.id}">↩ Ответить</button>
+                
+                <div class="reactions">
+                  <button class="reaction-btn like-btn ${isLiked}" data-id="${node.id}" data-action="like">
+                    👍 <span>${node.likes || 0}</span>
+                  </button>
+                  <button class="reaction-btn dislike-btn ${isDisliked}" data-id="${node.id}" data-action="dislike">
+                    👎 <span>${node.dislikes || 0}</span>
+                  </button>
+                </div>
               </div>
             </div>
             ${childrenHtml}
@@ -355,11 +400,57 @@
 
       feedEl.innerHTML = tree.map(renderNode).join('');
 
+      // Обработчики кнопок
       document.querySelectorAll('.reply-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           replyToPostId = e.target.dataset.id;
           replyModal.classList.add('open');
           replyText.focus();
+        });
+      });
+
+      // Обработчики реакций
+      document.querySelectorAll('.like-btn, .dislike-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const id = parseInt(e.currentTarget.dataset.id);
+          const action = e.currentTarget.dataset.action;
+          const post = allPosts.find(p => p.id === id);
+          if (!post) return;
+
+          let liked = JSON.parse(localStorage.getItem('vomit_liked') || '[]');
+          let disliked = JSON.parse(localStorage.getItem('vomit_disliked') || '[]');
+
+          if (action === 'like') {
+            if (liked.includes(id)) {
+              // Убираем лайк
+              liked = liked.filter(x => x !== id);
+              await client.from('posts').update({ likes: Math.max(0, post.likes - 1) }).eq('id', id);
+            } else {
+              // Ставим лайк
+              liked.push(id);
+              if (disliked.includes(id)) {
+                disliked = disliked.filter(x => x !== id);
+                await client.from('posts').update({ dislikes: Math.max(0, post.dislikes - 1) }).eq('id', id);
+              }
+              await client.from('posts').update({ likes: post.likes + 1 }).eq('id', id);
+            }
+          } else {
+            if (disliked.includes(id)) {
+              disliked = disliked.filter(x => x !== id);
+              await client.from('posts').update({ dislikes: Math.max(0, post.dislikes - 1) }).eq('id', id);
+            } else {
+              disliked.push(id);
+              if (liked.includes(id)) {
+                liked = liked.filter(x => x !== id);
+                await client.from('posts').update({ likes: Math.max(0, post.likes - 1) }).eq('id', id);
+              }
+              await client.from('posts').update({ dislikes: post.dislikes + 1 }).eq('id', id);
+            }
+          }
+
+          localStorage.setItem('vomit_liked', JSON.stringify(liked));
+          localStorage.setItem('vomit_disliked', JSON.stringify(disliked));
+          // Обновление произойдет через Realtime
         });
       });
     }
@@ -420,9 +511,18 @@
     // --- Realtime ---
     function subscribeToRealtime() {
       client.channel('public:posts')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, payload => {
-          allPosts.push(payload.new);
-          renderPosts();
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, payload => {
+          // Если обновление (лайк/дизлайк)
+          if (payload.eventType === 'UPDATE') {
+            const index = allPosts.findIndex(p => p.id === payload.new.id);
+            if (index !== -1) allPosts[index] = payload.new;
+            renderPosts();
+          } 
+          // Если добавление
+          else if (payload.eventType === 'INSERT') {
+            allPosts.push(payload.new);
+            renderPosts();
+          }
         }).subscribe();
         
       client.channel('public:boards')
@@ -432,20 +532,33 @@
         }).subscribe();
     }
 
-    // --- ТЕМА, ФОН И ПРОЗРАЧНОСТЬ ---
+    // --- ТЕМА И ФОН ---
     const settingsToggle = document.getElementById('settingsToggle');
     const settingsPanel = document.getElementById('settingsPanel');
-    const bgImageInput = document.getElementById('bgImageInput'); // Фон сайта
-    const boardBgInput = document.getElementById('boardBgInput'); // Фон борда
+    const closeSettings = document.getElementById('closeSettings');
+    const bgImageInput = document.getElementById('bgImageInput');
+    const boardBgInput = document.getElementById('boardBgInput');
     const accentColor = document.getElementById('accentColor');
     const bgCard = document.getElementById('bgCard');
     const textMain = document.getElementById('textMain');
     const radiusRange = document.getElementById('radiusRange');
     const opacityRange = document.getElementById('opacityRange');
 
+    // Открытие/закрытие настроек
     settingsToggle.addEventListener('click', () => settingsPanel.classList.toggle('open'));
+    closeSettings.addEventListener('click', () => settingsPanel.classList.remove('open'));
 
-    // Загрузка фона САЙТА
+    // Слушатели поиска и сортировки
+    searchInput.addEventListener('input', (e) => {
+      currentSearch = e.target.value.toLowerCase();
+      renderPosts();
+    });
+    sortSelect.addEventListener('change', (e) => {
+      currentSort = e.target.value;
+      renderPosts();
+    });
+
+    // Фоны
     bgImageInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -458,7 +571,6 @@
       reader.readAsDataURL(file);
     });
 
-    // Загрузка фона БОРДА
     boardBgInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -471,58 +583,14 @@
       reader.readAsDataURL(file);
     });
 
-    // Восстановление фонов
     const savedBg = localStorage.getItem('vomit_bg');
     if (savedBg) document.body.style.backgroundImage = `url(${savedBg})`;
 
     const savedBoardBg = localStorage.getItem('vomit_board_bg');
     if (savedBoardBg) appContainer.style.backgroundImage = `url(${savedBoardBg})`;
 
-    // Применение темы
+    // Тема
     function applyTheme() {
       document.documentElement.style.setProperty('--accent', accentColor.value);
       document.documentElement.style.setProperty('--bg-card', bgCard.value);
-      document.documentElement.style.setProperty('--text-main', textMain.value);
-      document.documentElement.style.setProperty('--radius', radiusRange.value + 'px');
-      document.documentElement.style.setProperty('--board-opacity', opacityRange.value); 
-    }
-    
-    // Восстановление настроек
-    const savedTheme = localStorage.getItem('vomit_theme');
-    if (savedTheme) {
-      const t = JSON.parse(savedTheme);
-      accentColor.value = t.accent; 
-      bgCard.value = t.bgCard; 
-      textMain.value = t.textMain; 
-      radiusRange.value = t.radius;
-      if (t.opacity) opacityRange.value = t.opacity;
-      applyTheme();
-    }
-
-    [accentColor, bgCard, textMain, radiusRange, opacityRange].forEach(el => {
-      el.addEventListener('input', () => {
-        applyTheme();
-        localStorage.setItem('vomit_theme', JSON.stringify({
-          accent: accentColor.value, 
-          bgCard: bgCard.value, 
-          textMain: textMain.value, 
-          radius: radiusRange.value,
-          opacity: opacityRange.value
-        }));
-      });
-    });
-
-    document.getElementById('resetSettings').addEventListener('click', () => {
-      localStorage.removeItem('vomit_theme');
-      localStorage.removeItem('vomit_bg');
-      localStorage.removeItem('vomit_board_bg');
-      location.reload();
-    });
-
-    // --- СТАРТ ---
-    loadBoards();
-    loadPosts();
-    subscribeToRealtime();
-  </script>
-</body>
-</html>
+      document.documentElement.style.setProperty('--text
