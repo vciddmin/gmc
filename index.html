@@ -5,541 +5,186 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>vomit.gmc · анонимный имиджборд</title>
   <style>
-    /* Глобальные стили — тёмная тема, минимализм */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-    }
-
-    body {
-      background: #1e1f22;
-      color: #e3e5e8;
-      display: flex;
-      justify-content: center;
-      padding: 2rem 1rem;
-      min-height: 100vh;
-    }
-
-    .board {
-      max-width: 1000px;
-      width: 100%;
-      background: #2b2d31;
-      border-radius: 28px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
-      padding: 2rem 1.5rem 2rem 1.5rem;
-      border: 1px solid #3c3f45;
-    }
-
-    /* Шапка борды */
-    .board-header {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 1.8rem;
-      border-bottom: 2px solid #3c3f45;
-      padding-bottom: 1rem;
-    }
-
-    .board-header h1 {
-      font-size: 1.9rem;
-      font-weight: 600;
-      letter-spacing: -0.5px;
-      color: #f2f3f5;
-    }
-
-    .board-header .badge {
-      background: #4e5058;
-      color: #b5bac1;
-      font-size: 0.85rem;
-      padding: 0.2rem 0.8rem;
-      border-radius: 20px;
-      font-weight: 500;
-    }
-
-    /* Форма нового поста */
-    .new-post-form {
-      background: #313338;
-      border-radius: 20px;
-      padding: 1.5rem;
-      margin-bottom: 2rem;
-      border: 1px solid #404249;
-    }
-
-    .form-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 1rem;
-      margin-bottom: 1rem;
-    }
-
-    .form-row input, .form-row textarea {
-      background: #1e1f22;
-      border: 1px solid #4e5058;
-      color: #e3e5e8;
-      padding: 0.8rem 1rem;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      transition: border 0.15s, box-shadow 0.15s;
-      outline: none;
-    }
-
-    .form-row input:focus, .form-row textarea:focus {
-      border-color: #5865f2;
-      box-shadow: 0 0 0 3px rgba(88, 101, 242, 0.3);
-    }
-
-    .form-row input {
-      flex: 1 1 150px;
-    }
-
-    .form-row textarea {
-      flex: 2 1 300px;
-      resize: vertical;
-      min-height: 90px;
-    }
-
-    .form-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 0.8rem;
-      align-items: center;
-    }
-
-    .btn {
-      background: #4e5058;
-      border: none;
-      color: #f2f3f5;
-      font-weight: 500;
-      padding: 0.8rem 1.8rem;
-      border-radius: 40px;
-      cursor: pointer;
-      font-size: 0.95rem;
-      transition: background 0.15s, transform 0.1s;
-      border: 1px solid transparent;
-    }
-
-    .btn:hover {
-      background: #5d6069;
-    }
-
-    .btn:active {
-      transform: scale(0.97);
-    }
-
-    .btn-primary {
-      background: #5865f2;
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: #4752c4;
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 1px solid #4e5058;
-    }
-
-    /* Счётчик постов и фильтр */
-    .board-toolbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 1.5rem;
-      color: #b5bac1;
-      font-size: 0.9rem;
-    }
-
-    .post-count {
-      background: #1e1f22;
-      padding: 0.3rem 1rem;
-      border-radius: 30px;
-    }
-
-    /* Лента постов */
-    .posts-feed {
-      display: flex;
-      flex-direction: column;
-      gap: 1.2rem;
-    }
-
-    .post-card {
-      background: #313338;
-      border-radius: 20px;
-      padding: 1.2rem 1.5rem 1rem 1.5rem;
-      border: 1px solid #3c3f45;
-      transition: border 0.2s;
-      animation: fadeIn 0.2s ease;
-    }
-
-    .post-card:hover {
-      border-color: #4e5058;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(5px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .post-header {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 0.8rem 1.2rem;
-      margin-bottom: 0.8rem;
-      font-size: 0.85rem;
-      color: #b5bac1;
-    }
-
-    .post-author {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      background: #1e1f22;
-      padding: 0.2rem 0.8rem;
-      border-radius: 30px;
-      font-weight: 500;
-      color: #dbdee1;
-    }
-
-    .post-author .avatar {
-      font-size: 1rem;
-    }
-
-    .post-date {
-      background: #1e1f22;
-      padding: 0.2rem 0.8rem;
-      border-radius: 30px;
-    }
-
-    .post-id {
-      background: #1e1f22;
-      padding: 0.2rem 0.8rem;
-      border-radius: 30px;
-      font-family: monospace;
-      color: #a6a8ad;
-    }
-
-    .post-text {
-      font-size: 1rem;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      word-break: break-word;
-      margin: 0.5rem 0 0.8rem 0;
-      color: #e3e5e8;
-    }
-
-    .post-footer {
-      display: flex;
-      gap: 1.2rem;
-      font-size: 0.8rem;
-      color: #7e8288;
-      border-top: 1px solid #3c3f45;
-      padding-top: 0.8rem;
-      margin-top: 0.4rem;
-    }
-
-    .post-footer span {
-      cursor: default;
-    }
-
-    /* Пустое состояние */
-    .empty-feed {
-      text-align: center;
-      padding: 3rem 1rem;
-      background: #2b2d31;
-      border-radius: 20px;
-      border: 1px dashed #4e5058;
-      color: #7e8288;
-      font-size: 1rem;
-    }
-
-    /* Адаптив */
-    @media (max-width: 600px) {
-      .board {
-        padding: 1.2rem;
-        border-radius: 20px;
-      }
-      .board-header h1 {
-        font-size: 1.5rem;
-      }
-      .form-row {
-        flex-direction: column;
-      }
-      .form-actions {
-        justify-content: stretch;
-      }
-      .form-actions .btn {
-        flex: 1;
-      }
-      .post-card {
-        padding: 1rem;
-      }
-    }
+    /* Стили оставляем без изменений, они не зависят от базы */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', Roboto, sans-serif; }
+    body { background: #1e1f22; color: #e3e5e8; display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
+    .board { max-width: 1000px; width: 100%; background: #2b2d31; border-radius: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); padding: 2rem 1.5rem; border: 1px solid #3c3f45; }
+    .board-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.8rem; border-bottom: 2px solid #3c3f45; padding-bottom: 1rem; }
+    .board-header h1 { font-size: 1.9rem; font-weight: 600; color: #f2f3f5; }
+    .board-header .badge { background: #4e5058; color: #b5bac1; font-size: 0.85rem; padding: 0.2rem 0.8rem; border-radius: 20px; }
+    .new-post-form { background: #313338; border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #404249; }
+    .form-row { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+    .form-row input, .form-row textarea { background: #1e1f22; border: 1px solid #4e5058; color: #e3e5e8; padding: 0.8rem 1rem; border-radius: 12px; font-size: 0.95rem; outline: none; }
+    .form-row input:focus, .form-row textarea:focus { border-color: #5865f2; box-shadow: 0 0 0 3px rgba(88,101,242,0.3); }
+    .form-row input { flex: 1 1 150px; }
+    .form-row textarea { flex: 2 1 300px; resize: vertical; min-height: 90px; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 0.8rem; }
+    .btn { background: #4e5058; border: none; color: #f2f3f5; font-weight: 500; padding: 0.8rem 1.8rem; border-radius: 40px; cursor: pointer; font-size: 0.95rem; }
+    .btn:hover { background: #5d6069; }
+    .btn-primary { background: #5865f2; color: white; }
+    .btn-primary:hover { background: #4752c4; }
+    .btn-outline { background: transparent; border: 1px solid #4e5058; }
+    .board-toolbar { display: flex; justify-content: space-between; margin-bottom: 1.5rem; color: #b5bac1; font-size: 0.9rem; }
+    .post-count { background: #1e1f22; padding: 0.3rem 1rem; border-radius: 30px; }
+    .posts-feed { display: flex; flex-direction: column; gap: 1.2rem; }
+    .post-card { background: #313338; border-radius: 20px; padding: 1.2rem 1.5rem; border: 1px solid #3c3f45; }
+    .post-header { display: flex; align-items: center; flex-wrap: wrap; gap: 0.8rem 1.2rem; margin-bottom: 0.8rem; font-size: 0.85rem; color: #b5bac1; }
+    .post-author { display: flex; align-items: center; gap: 0.4rem; background: #1e1f22; padding: 0.2rem 0.8rem; border-radius: 30px; font-weight: 500; color: #dbdee1; }
+    .post-date { background: #1e1f22; padding: 0.2rem 0.8rem; border-radius: 30px; }
+    .post-id { background: #1e1f22; padding: 0.2rem 0.8rem; border-radius: 30px; font-family: monospace; color: #a6a8ad; }
+    .post-text { font-size: 1rem; line-height: 1.55; white-space: pre-wrap; word-break: break-word; margin: 0.5rem 0; color: #e3e5e8; }
+    .empty-feed { text-align: center; padding: 3rem; background: #2b2d31; border-radius: 20px; border: 1px dashed #4e5058; color: #7e8288; }
   </style>
 </head>
 <body>
   <div class="board">
-    <!-- Шапка имиджборда -->
     <header class="board-header">
       <h1>🤢 vomit.gmc</h1>
       <span class="badge">анонимный имиджборд</span>
     </header>
 
-    <!-- Форма создания нового поста -->
     <section class="new-post-form">
       <form id="postForm">
         <div class="form-row">
-          <input type="text" id="authorInput" placeholder="Аноним (или ваш ник)" maxlength="30" autocomplete="off">
-          <textarea id="textInput" placeholder="Введите сообщение... (поддерживаются эмодзи и переносы строк)" required></textarea>
+          <input type="text" id="authorInput" placeholder="Аноним (или ваш ник)" maxlength="30">
+          <textarea id="textInput" placeholder="Введите сообщение..." required></textarea>
         </div>
         <div class="form-actions">
           <button type="button" class="btn btn-outline" id="clearBtn">Очистить</button>
-          <button type="submit" class="btn btn-primary">Отправить</button>
+          <button type="submit" class="btn btn-primary" id="submitBtn">Отправить</button>
         </div>
       </form>
     </section>
 
-    <!-- Панель с количеством постов -->
     <div class="board-toolbar">
-      <span class="post-count" id="postCount">0 постов</span>
-      <span>🕒 Новые сверху</span>
+      <span class="post-count" id="postCount">Загрузка...</span>
     </div>
 
-    <!-- Лента постов -->
-    <main class="posts-feed" id="postsFeed">
-      <!-- Посты будут добавляться сюда через JS -->
-    </main>
+    <main class="posts-feed" id="postsFeed"></main>
   </div>
 
+  <!-- Подключаем Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    (function() {
-      // ---------- ХРАНИЛИЩЕ ДАННЫХ ----------
-      // Используем localStorage, чтобы посты сохранялись между перезагрузками
-      const STORAGE_KEY = 'anon_board_posts';
+    // ====== НАСТРОЙКИ SUPABASE ======
+    // Вставь сюда свои значения из Project Settings -> API
+    const SUPABASE_URL = 'https://ixeckrmjjwfaghcrmiep.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_1gEN4w23ZxnYOosQ92_zGw_5oFocx6z';
+    // ================================
 
-      // Загружаем посты из localStorage или создаём пустой массив
-      let posts = [];
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      // Пробуем загрузить сохранённые посты
-      function loadPosts() {
-        try {
-          const stored = localStorage.getItem(STORAGE_KEY);
-          if (stored) {
-            posts = JSON.parse(stored);
-            // Проверка, что это массив
-            if (!Array.isArray(posts)) posts = [];
-          } else {
-            // Демо-посты для первого запуска (чтобы борда не была пустой)
-            posts = [
-              {
-                id: generateId(),
-                author: 'Аноним',
-                text: 'Добро пожаловать на имиджборд! Здесь можно писать анонимно. Все посты сохраняются в вашем браузере.',
-                timestamp: Date.now() - 3600000
-              },
-              {
-                id: generateId(),
-                author: 'Аноним',
-                text: 'Попробуйте отправить своё сообщение через форму выше. 🚀',
-                timestamp: Date.now() - 1800000
-              }
-            ];
-            savePosts();
-          }
-        } catch (e) {
-          console.warn('Ошибка загрузки постов:', e);
-          posts = [];
-        }
-        // Сортируем по убыванию времени (новые сверху)
-        posts.sort((a, b) => b.timestamp - a.timestamp);
+    const feedEl = document.getElementById('postsFeed');
+    const postCountEl = document.getElementById('postCount');
+    const postForm = document.getElementById('postForm');
+    const authorInput = document.getElementById('authorInput');
+    const textInput = document.getElementById('textInput');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Функция экранирования (защита от XSS)
+    function escapeHtml(text) {
+      if (!text) return '';
+      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // Форматирование времени
+    function formatDate(timestamp) {
+      const d = new Date(timestamp);
+      const now = new Date();
+      const diffMin = Math.floor((now - d) / 60000);
+      if (diffMin < 1) return 'только что';
+      if (diffMin < 60) return `${diffMin} мин. назад`;
+      if (diffMin < 1440) return `${Math.floor(diffMin / 60)} ч. назад`;
+      return d.toLocaleDateString('ru-RU');
+    }
+
+    // Отрисовка постов
+    function renderPosts(posts) {
+      if (!posts || posts.length === 0) {
+        feedEl.innerHTML = `<div class="empty-feed">✨ Пока нет ни одного поста. Будьте первым!</div>`;
+        postCountEl.textContent = `0 постов`;
+        return;
       }
 
-      // Сохраняем посты в localStorage
-      function savePosts() {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-        } catch (e) {
-          console.warn('Ошибка сохранения постов:', e);
-        }
+      postCountEl.textContent = `${posts.length} ${posts.length === 1 ? 'пост' : (posts.length < 5 ? 'поста' : 'постов')}`;
+
+      feedEl.innerHTML = posts.map(post => `
+        <article class="post-card">
+          <div class="post-header">
+            <span class="post-author">👤 ${escapeHtml(post.author || 'Аноним')}</span>
+            <span class="post-date">🕒 ${formatDate(post.created_at)}</span>
+            <span class="post-id">#${post.id}</span>
+          </div>
+          <div class="post-text">${escapeHtml(post.text).replace(/\n/g, '<br>')}</div>
+        </article>
+      `).join('');
+    }
+
+    // Загрузка начальных данных
+    async function loadPosts() {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Ошибка загрузки:', error);
+        feedEl.innerHTML = `<div class="empty-feed">Ошибка подключения к базе данных. Проверь ключи.</div>`;
+        return;
+      }
+      renderPosts(data);
+    }
+
+    // Подписка на новые посты в реальном времени
+    function subscribeToNewPosts() {
+      supabase
+        .channel('public:posts')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, payload => {
+          // Когда кто-то в мире отправляет пост, он появляется здесь
+          console.log('Новый пост:', payload.new);
+          loadPosts(); // Перезагружаем ленту (простой способ синхронизации)
+        })
+        .subscribe();
+    }
+
+    // Отправка формы
+    postForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const author = authorInput.value.trim() || 'Аноним';
+      const text = textInput.value.trim();
+
+      if (!text) return;
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Отправка...';
+
+      const { error } = await supabase
+        .from('posts')
+        .insert([{ author: author, text: text }]);
+
+      if (error) {
+        console.error('Ошибка отправки:', error);
+        alert('Не удалось отправить сообщение. Попробуй позже.');
+      } else {
+        textInput.value = ''; // Очищаем поле
+        authorInput.value = '';
+        // Лента обновится сама через Realtime подписку, но на всякий случай:
+        loadPosts(); 
       }
 
-      // Генерация уникального ID (короткий, для отображения)
-      function generateId() {
-        return Math.random().toString(36).substring(2, 8).toUpperCase();
-      }
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Отправить';
+    });
 
-      // Форматирование даты для отображения
-      function formatDate(timestamp) {
-        const d = new Date(timestamp);
-        const now = new Date();
-        const diffMs = now - d;
-        const diffMins = Math.floor(diffMs / 60000);
-        const diffHours = Math.floor(diffMs / 3600000);
-        const diffDays = Math.floor(diffMs / 86400000);
+    // Кнопка очистки
+    document.getElementById('clearBtn').addEventListener('click', () => {
+      textInput.value = '';
+      authorInput.value = '';
+    });
 
-        if (diffMins < 1) return 'только что';
-        if (diffMins < 60) return `${diffMins} мин. назад`;
-        if (diffHours < 24) return `${diffHours} ч. назад`;
-        if (diffDays === 1) return 'вчера';
-        if (diffDays < 7) return `${diffDays} дн. назад`;
-
-        // Иначе полная дата
-        return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' });
-      }
-
-      // ---------- ОТРИСОВКА ПОСТОВ ----------
-      const feedEl = document.getElementById('postsFeed');
-      const postCountEl = document.getElementById('postCount');
-
-      function renderPosts() {
-        if (!feedEl) return;
-
-        // Обновляем счётчик
-        if (postCountEl) {
-          const count = posts.length;
-          postCountEl.textContent = `${count} ${pluralize(count, 'пост', 'поста', 'постов')}`;
-        }
-
-        // Если нет постов — показываем заглушку
-        if (posts.length === 0) {
-          feedEl.innerHTML = `<div class="empty-feed">✨ Пока нет ни одного поста. Будьте первым!</div>`;
-          return;
-        }
-
-        // Сортируем посты (новые сверху) перед отрисовкой
-        const sorted = [...posts].sort((a, b) => b.timestamp - a.timestamp);
-
-        // Строим HTML для каждого поста
-        const postsHtml = sorted.map(post => {
-          // Безопасное экранирование текста (чтобы избежать XSS)
-          const safeAuthor = escapeHtml(post.author || 'Аноним');
-          const safeText = escapeHtml(post.text).replace(/\n/g, '<br>');
-          const postId = post.id ? post.id : generateId();
-          const dateStr = formatDate(post.timestamp);
-
-          return `
-            <article class="post-card" data-post-id="${postId}">
-              <div class="post-header">
-                <span class="post-author"><span class="avatar">👤</span> ${safeAuthor}</span>
-                <span class="post-date">🕒 ${dateStr}</span>
-                <span class="post-id">#${postId}</span>
-              </div>
-              <div class="post-text">${safeText}</div>
-              <div class="post-footer">
-                <span>💬 0</span>
-                <span>❤️ 0</span>
-                <span>🔁 0</span>
-              </div>
-            </article>
-          `;
-        }).join('');
-
-        feedEl.innerHTML = postsHtml;
-      }
-
-      // Вспомогательная функция для склонения
-      function pluralize(num, one, two, five) {
-        const n = Math.abs(num) % 100;
-        const n1 = n % 10;
-        if (n > 10 && n < 20) return five;
-        if (n1 > 1 && n1 < 5) return two;
-        if (n1 === 1) return one;
-        return five;
-      }
-
-      // Экранирование HTML (защита от XSS)
-      function escapeHtml(unsafe) {
-        if (!unsafe) return '';
-        return unsafe
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;')
-          .replace(/'/g, '&#039;');
-      }
-
-      // ---------- ДОБАВЛЕНИЕ НОВОГО ПОСТА ----------
-      const postForm = document.getElementById('postForm');
-      const authorInput = document.getElementById('authorInput');
-      const textInput = document.getElementById('textInput');
-      const clearBtn = document.getElementById('clearBtn');
-
-      function addNewPost(author, text) {
-        const trimmedText = text.trim();
-        if (!trimmedText) return false; // не добавляем пустые
-
-        const newPost = {
-          id: generateId(),
-          author: author.trim() || 'Аноним',
-          text: trimmedText,
-          timestamp: Date.now()
-        };
-
-        posts.push(newPost);
-        savePosts();
-        renderPosts();
-        return true;
-      }
-
-      // Обработчик отправки формы
-      if (postForm) {
-        postForm.addEventListener('submit', (e) => {
-          e.preventDefault();
-
-          const author = authorInput ? authorInput.value : '';
-          const text = textInput ? textInput.value : '';
-
-          if (!text.trim()) {
-            // Если пусто — подсветим поле
-            if (textInput) {
-              textInput.style.borderColor = '#ed4245';
-              textInput.focus();
-              setTimeout(() => {
-                textInput.style.borderColor = '#4e5058';
-              }, 1000);
-            }
-            return;
-          }
-
-          addNewPost(author, text);
-
-          // Очищаем поля
-          if (textInput) textInput.value = '';
-          if (authorInput) authorInput.value = '';
-
-          // Прокрутка к началу ленты (к новому посту)
-          feedEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-      }
-
-      // Кнопка "Очистить"
-      if (clearBtn) {
-        clearBtn.addEventListener('click', () => {
-          if (authorInput) authorInput.value = '';
-          if (textInput) textInput.value = '';
-          if (textInput) textInput.focus();
-        });
-      }
-
-      // Инициализация: загрузка + отрисовка
-      loadPosts();
-      renderPosts();
-
-      // Небольшой бонус: если в URL есть ?clear=1, очищаем localStorage (для теста)
-      // (необязательно, но полезно при разработке)
-      if (window.location.search.includes('clear=1')) {
-        localStorage.removeItem(STORAGE_KEY);
-        posts = [];
-        savePosts();
-        renderPosts();
-        // Убираем параметр из URL без перезагрузки
-        window.history.replaceState({}, document.title, window.location.pathname);
-      }
-
-    })();
+    // Инициализация
+    loadPosts();
+    subscribeToNewPosts();
   </script>
 </body>
 </html>
