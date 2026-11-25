@@ -3,82 +3,181 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>vomit.gmc · анонимный имиджборд</title>
+  <title>vomit.gmc · #cryghanistan</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', Roboto, sans-serif; }
-    body { background: #1e1f22; color: #e3e5e8; display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
-    .board { max-width: 1000px; width: 100%; background: #2b2d31; border-radius: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); padding: 2rem 1.5rem; border: 1px solid #3c3f45; }
-    .board-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.8rem; border-bottom: 2px solid #3c3f45; padding-bottom: 1rem; }
-    .board-header h1 { font-size: 1.9rem; font-weight: 600; color: #f2f3f5; }
-    .board-header .badge { background: #4e5058; color: #b5bac1; font-size: 0.85rem; padding: 0.2rem 0.8rem; border-radius: 20px; }
-    .new-post-form { background: #313338; border-radius: 20px; padding: 1.5rem; margin-bottom: 2rem; border: 1px solid #404249; }
-    .form-row { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
-    .form-row input, .form-row textarea { background: #1e1f22; border: 1px solid #4e5058; color: #e3e5e8; padding: 0.8rem 1rem; border-radius: 12px; font-size: 0.95rem; outline: none; }
-    .form-row input:focus, .form-row textarea:focus { border-color: #5865f2; box-shadow: 0 0 0 3px rgba(88,101,242,0.3); }
-    .form-row input { flex: 1 1 150px; }
-    .form-row textarea { flex: 2 1 300px; resize: vertical; min-height: 90px; }
+    /* 1. ПЕРЕМЕННЫЕ ДЛЯ КАСТОМИЗАЦИИ */
+    :root {
+      --bg-body: #1a1b1e;
+      --bg-board: #232428;
+      --bg-sidebar: #1e1f22;
+      --bg-card: #2b2d31;
+      --bg-input: #1e1f22;
+      --text-main: #e3e5e8;
+      --text-muted: #949ba4;
+      --accent: #5865f2;
+      --border-color: #313338;
+      --radius: 16px;
+      --font-main: system-ui, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* 2. ОБЩИЕ СТИЛИ */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
+    body { background: var(--bg-body); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; transition: background 0.3s, color 0.3s; }
+    
+    .app-container { display: flex; width: 100%; max-width: 1200px; background: var(--bg-board); box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: background 0.3s; }
+    
+    /* Сайдбар */
+    .sidebar { width: 240px; background: var(--bg-sidebar); padding: 2rem 1rem; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.5rem; flex-shrink: 0; transition: background 0.3s, border-color 0.3s; }
+    .sidebar-logo { font-size: 1.4rem; font-weight: 700; color: #f2f3f5; margin-bottom: 1.5rem; padding-left: 0.5rem; letter-spacing: -0.5px; }
+    .sidebar-logo span { font-size: 1.8rem; vertical-align: middle; margin-right: 5px; }
+    .board-btn { background: transparent; border: none; color: var(--text-muted); font-size: 1rem; font-weight: 500; text-align: left; padding: 0.8rem 1rem; border-radius: 12px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 10px; }
+    .board-btn:hover { background: var(--bg-card); color: var(--text-main); }
+    .board-btn.active { background: var(--accent); color: white; }
+    
+    /* Основной контент */
+    .main-content { flex: 1; padding: 2rem; display: flex; flex-direction: column; max-height: 100vh; overflow-y: auto; }
+    .header { border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 1.8rem; font-weight: 600; color: #f2f3f5; }
+    .header h1 span { color: var(--text-muted); font-weight: 400; font-size: 1.2rem; margin-left: 10px; }
+
+    /* Форма */
+    .new-post-form { background: var(--bg-card); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 2rem; border: 1px solid var(--border-color); transition: 0.3s; }
+    .form-row { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1rem; }
+    .form-row input, .form-row textarea { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem 1rem; border-radius: 10px; font-size: 0.95rem; outline: none; transition: 0.2s; }
+    .form-row input:focus, .form-row textarea:focus { border-color: var(--accent); }
+    .form-row input { max-width: 250px; }
+    .form-row textarea { resize: vertical; min-height: 80px; }
     .form-actions { display: flex; justify-content: flex-end; gap: 0.8rem; }
-    .btn { background: #4e5058; border: none; color: #f2f3f5; font-weight: 500; padding: 0.8rem 1.8rem; border-radius: 40px; cursor: pointer; font-size: 0.95rem; transition: 0.2s; }
-    .btn:hover { background: #5d6069; }
-    .btn-primary { background: #5865f2; color: white; }
-    .btn-primary:hover { background: #4752c4; }
-    .btn-outline { background: transparent; border: 1px solid #4e5058; }
-    .board-toolbar { display: flex; justify-content: space-between; margin-bottom: 1.5rem; color: #b5bac1; font-size: 0.9rem; }
-    .post-count { background: #1e1f22; padding: 0.3rem 1rem; border-radius: 30px; }
-    .posts-feed { display: flex; flex-direction: column; gap: 1.2rem; }
-    .post-card { background: #313338; border-radius: 20px; padding: 1.2rem 1.5rem; border: 1px solid #3c3f45; animation: fadeIn 0.3s ease; }
-    .post-header { display: flex; align-items: center; flex-wrap: wrap; gap: 0.8rem 1.2rem; margin-bottom: 0.8rem; font-size: 0.85rem; color: #b5bac1; }
-    .post-author { display: flex; align-items: center; gap: 0.4rem; background: #1e1f22; padding: 0.2rem 0.8rem; border-radius: 30px; font-weight: 500; color: #dbdee1; }
-    .post-date { background: #1e1f22; padding: 0.2rem 0.8rem; border-radius: 30px; }
-    .post-id { background: #1e1f22; padding: 0.2rem 0.8rem; border-radius: 30px; font-family: monospace; color: #a6a8ad; }
-    .post-text { font-size: 1rem; line-height: 1.55; white-space: pre-wrap; word-break: break-word; margin: 0.5rem 0; color: #e3e5e8; }
-    .empty-feed { text-align: center; padding: 3rem; background: #2b2d31; border-radius: 20px; border: 1px dashed #4e5058; color: #7e8288; }
+    .btn { border: none; color: #f2f3f5; font-weight: 500; padding: 0.8rem 1.5rem; border-radius: 10px; cursor: pointer; font-size: 0.95rem; transition: 0.2s; }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-primary:hover { filter: brightness(0.9); }
+    .btn-outline { background: transparent; border: 1px solid var(--border-color); }
+    .btn-outline:hover { background: var(--bg-board); }
+
+    /* Посты */
+    .posts-feed { display: flex; flex-direction: column; gap: 1rem; }
+    .post-card { background: var(--bg-card); border-radius: var(--radius); padding: 1.2rem; border: 1px solid var(--border-color); animation: fadeIn 0.3s ease; transition: 0.3s; }
+    .post-header { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.8rem; font-size: 0.85rem; color: var(--text-muted); }
+    .post-author { background: var(--bg-input); padding: 0.2rem 0.8rem; border-radius: 20px; font-weight: 600; color: var(--text-main); }
+    .post-board-tag { background: var(--border-color); padding: 0.2rem 0.8rem; border-radius: 20px; color: var(--text-muted); font-weight: 500; }
+    .post-date { margin-left: auto; }
+    .post-text { font-size: 1rem; line-height: 1.5; white-space: pre-wrap; word-break: break-word; color: var(--text-main); }
+    .empty-feed { text-align: center; padding: 3rem; background: var(--bg-card); border-radius: var(--radius); border: 1px dashed var(--border-color); color: var(--text-muted); }
+    .error-msg { color: #ed4245; text-align: center; padding: 1rem; background: rgba(237,66,69,0.1); border-radius: 10px; margin-top: 1rem; font-size: 0.9rem; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
-    .error-msg { color: #ed4245; text-align: center; padding: 1rem; background: rgba(237, 66, 69, 0.1); border-radius: 12px; margin-top: 1rem; font-size: 0.9rem; }
+
+    /* 3. ПАНЕЛЬ НАСТРОЕК ДИЗАЙНА */
+    .settings-toggle { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+    .settings-toggle:hover { transform: scale(1.1); }
+    .settings-panel { position: fixed; top: 0; right: -350px; width: 320px; height: 100vh; background: var(--bg-sidebar); border-left: 1px solid var(--border-color); padding: 2rem 1.5rem; box-shadow: -5px 0 20px rgba(0,0,0,0.5); z-index: 1001; transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1); overflow-y: auto; }
+    .settings-panel.open { right: 0; }
+    .settings-panel h2 { font-size: 1.3rem; margin-bottom: 1.5rem; color: var(--text-main); }
+    .setting-group { margin-bottom: 1.5rem; }
+    .setting-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; font-weight: 500; }
+    .setting-group input[type="color"] { width: 100%; height: 40px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-input); cursor: pointer; padding: 2px; }
+    .setting-group input[type="range"] { width: 100%; cursor: pointer; accent-color: var(--accent); }
+    .setting-group select { width: 100%; padding: 0.6rem; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; }
+
+    /* 4. АДАПТИВ */
+    @media (max-width: 768px) {
+      .app-container { flex-direction: column; }
+      .sidebar { width: 100%; padding: 1rem; flex-direction: row; overflow-x: auto; border-right: none; border-bottom: 1px solid var(--border-color); align-items: center; }
+      .sidebar-logo { margin-bottom: 0; margin-right: 1rem; font-size: 1.2rem; white-space: nowrap; }
+      .board-btn { padding: 0.5rem 1rem; font-size: 0.9rem; white-space: nowrap; }
+      .main-content { padding: 1rem; }
+      .header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+    }
   </style>
 </head>
 <body>
-  <div class="board">
-    <header class="board-header">
-      <h1>🤢 vomit.gmc</h1>
-      <span class="badge">анонимный имиджборд</span>
-    </header>
+  <div class="app-container">
+    <!-- Сайдбар с ветками -->
+    <aside class="sidebar">
+      <div class="sidebar-logo"><span>🤢</span>vomit.gmc</div>
+      <button class="board-btn active" data-board="random">🎲 /random/</button>
+      <button class="board-btn" data-board="tech">💻 /vibecode/</button>
+      <button class="board-btn" data-board="games">🎮 /для инцелов/</button>
+      <button class="board-btn" data-board="music">🎵 /music/</button>
+      <button class="board-btn" data-board="anime">🌸 /для пидоров/</button>
+    </aside>
 
-    <section class="new-post-form">
-      <form id="postForm">
-        <div class="form-row">
-          <input type="text" id="authorInput" placeholder="Аноним (или ваш ник)" maxlength="30" autocomplete="off">
-          <textarea id="textInput" placeholder="Введите сообщение..." required></textarea>
-        </div>
-        <div class="form-actions">
-          <button type="button" class="btn btn-outline" id="clearBtn">Очистить</button>
-          <button type="submit" class="btn btn-primary" id="submitBtn">Отправить</button>
-        </div>
-      </form>
-      <div id="errorBox"></div>
-    </section>
+    <!-- Основной контент -->
+    <main class="main-content">
+      <header class="header">
+        <h1 id="boardTitle">/random/ <span>— рандом хуйня</span></h1>
+        <span id="postCount" style="color: var(--text-muted); font-size: 0.9rem;">Загрузка...</span>
+      </header>
 
-    <div class="board-toolbar">
-      <span class="post-count" id="postCount">Загрузка...</span>
-      <span>🕒 Новые сверху</span>
-    </div>
+      <section class="new-post-form">
+        <form id="postForm">
+          <div class="form-row">
+            <input type="text" id="authorInput" placeholder="Аноним (или ваш ник)" maxlength="30" autocomplete="off">
+            <textarea id="textInput" placeholder="Введите сообщение в эту ветку..." required></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-outline" id="clearBtn">Очистить</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">Отправить</button>
+          </div>
+        </form>
+        <div id="errorBox"></div>
+      </section>
 
-    <main class="posts-feed" id="postsFeed"></main>
+      <main class="posts-feed" id="postsFeed"></main>
+    </main>
   </div>
 
-  <!-- Подключаем библиотеку Supabase (v2) -->
+  <!-- Кнопка и Панель настроек -->
+  <button class="settings-toggle" id="settingsToggle">⚙️</button>
+  <div class="settings-panel" id="settingsPanel">
+    <h2>Настройки дизайна</h2>
+    <div class="setting-group">
+      <label>Основной цвет (акцент)</label>
+      <input type="color" id="accentColor" value="#5865f2">
+    </div>
+    <div class="setting-group">
+      <label>Фон сайта</label>
+      <input type="color" id="bgBody" value="#1a1b1e">
+    </div>
+    <div class="setting-group">
+      <label>Фон карточек</label>
+      <input type="color" id="bgCard" value="#2b2d31">
+    </div>
+    <div class="setting-group">
+      <label>Цвет текста</label>
+      <input type="color" id="textMain" value="#e3e5e8">
+    </div>
+    <div class="setting-group">
+      <label>Скругление углов (px)</label>
+      <input type="range" id="radiusRange" min="0" max="30" value="16">
+    </div>
+    <div class="setting-group">
+      <label>Шрифт</label>
+      <select id="fontSelect">
+        <option value="system-ui, sans-serif">Системный</option>
+        <option value="'Courier New', monospace">Моноширинный</option>
+        <option value="'Comic Sans MS', cursive">Comic Sans</option>
+        <option value="Arial, sans-serif">Arial</option>
+        <option value="Georgia, serif">Georgia</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" style="width:100%; margin-top: 1rem;" id="resetSettings">Сбросить настройки</button>
+  </div>
+
+  <!-- Supabase и скрипты -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
   <script>
     // =========================================================
-    // ⚠️ ВСТАВЬ СЮДА СВОИ КЛЮЧИ ИЗ SUPABASE (Project Settings -> API)
+    // ⚠️ ВСТАВЬ СЮДА СВОЙ КЛЮЧ (Project Settings -> API -> Publishable key / anon)
     // =========================================================
-    const SUPABASE_URL = 'https://ixeckrmjjwfaghcrmiep.supabase.co'; // Твой URL
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZWNrcm1qandmYWdoY3JtaWVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU2MzYxODEsImV4cCI6MjExMTIxMjE4MX0.jtDXNqivgLQTS8JefwFr2s1XpLWSNqphVj14vn0r73Q'; // Publishable key или anon public
+    const SUPABASE_URL = 'https://ixeckrmjjwfaghcrmiep.supabase.co'; 
+    const SUPABASE_ANON_KEY = 'sb_publishable_1gEN4w23ZxnYOosQ92_zGw_5oFocx6z'; // <--- ЗАМЕНИ ЭТО
     // =========================================================
 
-    // Инициализация клиента. Называем его client, чтобы не конфликтовать с window.supabase
     const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Состояние
+    let currentBoard = 'random';
+    let allPosts = [];
 
     // DOM элементы
     const feedEl = document.getElementById('postsFeed');
@@ -88,16 +187,22 @@
     const textInput = document.getElementById('textInput');
     const submitBtn = document.getElementById('submitBtn');
     const errorBox = document.getElementById('errorBox');
+    const boardTitle = document.getElementById('boardTitle');
 
-    // Функция для защиты от XSS (экранирование HTML)
+    const boardNames = {
+      'random': '— случайные мысли',
+      'tech': '— технологии и код',
+      'games': '— игры и киберспорт',
+      'music': '— музыка и звук',
+      'anime': '— аниме и манга'
+    };
+
+    // --- Вспомогательные функции ---
     function escapeHTML(str) {
       if (!str) return '';
-      return str.replace(/[&<>'"]/g, 
-        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag])
-      );
+      return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
     }
 
-    // Форматирование времени
     function formatDate(timestamp) {
       const d = new Date(timestamp);
       const now = new Date();
@@ -108,33 +213,31 @@
       return d.toLocaleDateString('ru-RU');
     }
 
-    // Отрисовка постов на странице
-    function renderPosts(posts) {
-      if (!posts || posts.length === 0) {
-        feedEl.innerHTML = `<div class="empty-feed">✨ Пока нет ни одного поста. Будьте первым!</div>`;
+    // --- Рендер постов ---
+    function renderPosts() {
+      const filteredPosts = allPosts.filter(p => p.board === currentBoard);
+      if (filteredPosts.length === 0) {
+        feedEl.innerHTML = `<div class="empty-feed">✨ В ветке /${currentBoard}/ пока пусто. Напиши первым!</div>`;
         postCountEl.textContent = `0 постов`;
         return;
       }
+      postCountEl.textContent = `${filteredPosts.length} ${filteredPosts.length === 1 ? 'пост' : (filteredPosts.length < 5 ? 'поста' : 'постов')}`;
 
-      const count = posts.length;
-      postCountEl.textContent = `${count} ${count === 1 ? 'пост' : (count < 5 ? 'поста' : 'постов')}`;
-
-      feedEl.innerHTML = posts.map(post => `
+      feedEl.innerHTML = filteredPosts.map(post => `
         <article class="post-card">
           <div class="post-header">
             <span class="post-author">👤 ${escapeHTML(post.author || 'Аноним')}</span>
+            <span class="post-board-tag">/${post.board}/</span>
             <span class="post-date">🕒 ${formatDate(post.created_at)}</span>
-            <span class="post-id">#${post.id}</span>
           </div>
           <div class="post-text">${escapeHTML(post.text).replace(/\n/g, '<br>')}</div>
         </article>
       `).join('');
     }
 
-    // Загрузка данных из БД
+    // --- Загрузка данных ---
     async function loadPosts() {
       try {
-        // AbortSignal.timeout(10000) — если за 10 сек не ответит, выдаст ошибку
         const { data, error } = await client
           .from('posts')
           .select('*')
@@ -142,57 +245,45 @@
           .abortSignal(AbortSignal.timeout(10000));
 
         if (error) throw error;
-        
-        renderPosts(data);
+        allPosts = data;
+        renderPosts();
       } catch (err) {
         console.error('Ошибка загрузки:', err);
-        feedEl.innerHTML = `<div class="empty-feed">Не удалось загрузить посты. Проверь соединение.</div>`;
+        feedEl.innerHTML = `<div class="empty-feed">Не удалось загрузить посты.</div>`;
         postCountEl.textContent = 'Ошибка';
         errorBox.innerHTML = `<div class="error-msg">Ошибка: ${escapeHTML(err.message)}</div>`;
       }
     }
 
-    // Подписка на новые посты (Realtime)
-    function subscribeToRealtime() {
-      client
-        .channel('public:posts')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, payload => {
-          console.log('Прилетел новый пост:', payload.new);
-          // Перезагружаем ленту, чтобы новый пост встал на свое место (сверху)
-          loadPosts(); 
-        })
-        .subscribe();
-    }
+    // --- Переключение веток ---
+    document.querySelectorAll('.board-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.board-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        currentBoard = e.target.dataset.board;
+        boardTitle.innerHTML = `/${currentBoard}/ <span>${boardNames[currentBoard] || ''}</span>`;
+        renderPosts();
+      });
+    });
 
-    // Отправка формы
+    // --- Отправка поста ---
     postForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      errorBox.innerHTML = ''; // Очищаем старые ошибки
-      
+      errorBox.innerHTML = '';
       const author = authorInput.value.trim() || 'Аноним';
       const text = textInput.value.trim();
-
       if (!text) return;
 
-      // Блокируем кнопку, чтобы не спамили
       submitBtn.disabled = true;
       submitBtn.textContent = 'Отправка...';
 
       try {
         const { error } = await client
           .from('posts')
-          .insert([{ author: author, text: text }]);
-
+          .insert([{ author: author, text: text, board: currentBoard }]);
         if (error) throw error;
-
-        // Очищаем поля после успешной отправки
         textInput.value = '';
-        authorInput.value = '';
-        
-        // Подписка Realtime сама обновит ленту, но на всякий случай вызовем loadPosts
-        loadPosts(); 
       } catch (err) {
-        console.error('Ошибка отправки:', err);
         errorBox.innerHTML = `<div class="error-msg">Не удалось отправить: ${escapeHTML(err.message)}</div>`;
       } finally {
         submitBtn.disabled = false;
@@ -200,16 +291,80 @@
       }
     });
 
-    // Кнопка "Очистить"
+    // --- Realtime ---
+    function subscribeToRealtime() {
+      client.channel('public:posts')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, payload => {
+          allPosts.unshift(payload.new);
+          renderPosts();
+        })
+        .subscribe();
+    }
+
     document.getElementById('clearBtn').addEventListener('click', () => {
       textInput.value = '';
       authorInput.value = '';
       errorBox.innerHTML = '';
     });
 
-    // ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
+    // --- ЛОГИКА КАСТОМИЗАЦИИ ДИЗАЙНА ---
+    const settingsToggle = document.getElementById('settingsToggle');
+    const settingsPanel = document.getElementById('settingsPanel');
+    const accentColor = document.getElementById('accentColor');
+    const bgBody = document.getElementById('bgBody');
+    const bgCard = document.getElementById('bgCard');
+    const textMain = document.getElementById('textMain');
+    const radiusRange = document.getElementById('radiusRange');
+    const fontSelect = document.getElementById('fontSelect');
+    const resetSettings = document.getElementById('resetSettings');
+
+    settingsToggle.addEventListener('click', () => settingsPanel.classList.toggle('open'));
+
+    function applyTheme(theme) {
+      document.documentElement.style.setProperty('--accent', theme.accent);
+      document.documentElement.style.setProperty('--bg-body', theme.bgBody);
+      document.documentElement.style.setProperty('--bg-board', theme.bgBody);
+      document.documentElement.style.setProperty('--bg-card', theme.bgCard);
+      document.documentElement.style.setProperty('--bg-sidebar', theme.bgCard);
+      document.documentElement.style.setProperty('--bg-input', theme.bgBody);
+      document.documentElement.style.setProperty('--text-main', theme.textMain);
+      document.documentElement.style.setProperty('--border-color', theme.bgCard);
+      document.documentElement.style.setProperty('--radius', theme.radius + 'px');
+      document.documentElement.style.setProperty('--font-main', theme.font);
+      localStorage.setItem('vomit_theme', JSON.stringify(theme));
+    }
+
+    function loadTheme() {
+      const saved = localStorage.getItem('vomit_theme');
+      if (saved) {
+        const theme = JSON.parse(saved);
+        accentColor.value = theme.accent;
+        bgBody.value = theme.bgBody;
+        bgCard.value = theme.bgCard;
+        textMain.value = theme.textMain;
+        radiusRange.value = theme.radius;
+        fontSelect.value = theme.font;
+        applyTheme(theme);
+      } else {
+        applyTheme({ accent: '#5865f2', bgBody: '#1a1b1e', bgCard: '#2b2d31', textMain: '#e3e5e8', radius: 16, font: 'system-ui, sans-serif' });
+      }
+    }
+
+    function getCurrentTheme() {
+      return { accent: accentColor.value, bgBody: bgBody.value, bgCard: bgCard.value, textMain: textMain.value, radius: radiusRange.value, font: fontSelect.value };
+    }
+
+    [accentColor, bgBody, bgCard, textMain].forEach(input => {
+      input.addEventListener('input', () => applyTheme(getCurrentTheme()));
+    });
+    radiusRange.addEventListener('input', () => applyTheme(getCurrentTheme()));
+    fontSelect.addEventListener('change', () => applyTheme(getCurrentTheme()));
+    resetSettings.addEventListener('click', () => { localStorage.removeItem('vomit_theme'); location.reload(); });
+
+    // --- ЗАПУСК ---
     loadPosts();
     subscribeToRealtime();
+    loadTheme();
   </script>
 </body>
 </html>
