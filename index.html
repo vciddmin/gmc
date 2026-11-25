@@ -72,7 +72,7 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZWNrcm1qandmYWdoY3JtaWVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU2MzYxODEsImV4cCI6MjExMTIxMjE4MX0.jtDXNqivgLQTS8JefwFr2s1XpLWSNqphVj14vn0r73Q';
     // ================================
 
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const feedEl = document.getElementById('postsFeed');
     const postCountEl = document.getElementById('postCount');
