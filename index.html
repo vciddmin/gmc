@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>vomit.gmc · #cryghanistan</title>
+  <title>vomit.gmc · анонимный имиджборд</title>
   <style>
-    /* Стили оставляем без изменений, они не зависят от базы */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', Roboto, sans-serif; }
     body { background: #1e1f22; color: #e3e5e8; display: flex; justify-content: center; padding: 2rem 1rem; min-height: 100vh; }
     .board { max-width: 1000px; width: 100%; background: #2b2d31; border-radius: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); padding: 2rem 1.5rem; border: 1px solid #3c3f45; }
@@ -19,7 +18,7 @@
     .form-row input { flex: 1 1 150px; }
     .form-row textarea { flex: 2 1 300px; resize: vertical; min-height: 90px; }
     .form-actions { display: flex; justify-content: flex-end; gap: 0.8rem; }
-    .btn { background: #4e5058; border: none; color: #f2f3f5; font-weight: 500; padding: 0.8rem 1.8rem; border-radius: 40px; cursor: pointer; font-size: 0.95rem; }
+    .btn { background: #4e5058; border: none; color: #f2f3f5; font-weight: 500; padding: 0.8rem 1.8rem; border-radius: 40px; cursor: pointer; font-size: 0.95rem; transition: 0.2s; }
     .btn:hover { background: #5d6069; }
     .btn-primary { background: #5865f2; color: white; }
     .btn-primary:hover { background: #4752c4; }
@@ -27,26 +26,28 @@
     .board-toolbar { display: flex; justify-content: space-between; margin-bottom: 1.5rem; color: #b5bac1; font-size: 0.9rem; }
     .post-count { background: #1e1f22; padding: 0.3rem 1rem; border-radius: 30px; }
     .posts-feed { display: flex; flex-direction: column; gap: 1.2rem; }
-    .post-card { background: #313338; border-radius: 20px; padding: 1.2rem 1.5rem; border: 1px solid #3c3f45; }
+    .post-card { background: #313338; border-radius: 20px; padding: 1.2rem 1.5rem; border: 1px solid #3c3f45; animation: fadeIn 0.3s ease; }
     .post-header { display: flex; align-items: center; flex-wrap: wrap; gap: 0.8rem 1.2rem; margin-bottom: 0.8rem; font-size: 0.85rem; color: #b5bac1; }
     .post-author { display: flex; align-items: center; gap: 0.4rem; background: #1e1f22; padding: 0.2rem 0.8rem; border-radius: 30px; font-weight: 500; color: #dbdee1; }
     .post-date { background: #1e1f22; padding: 0.2rem 0.8rem; border-radius: 30px; }
     .post-id { background: #1e1f22; padding: 0.2rem 0.8rem; border-radius: 30px; font-family: monospace; color: #a6a8ad; }
     .post-text { font-size: 1rem; line-height: 1.55; white-space: pre-wrap; word-break: break-word; margin: 0.5rem 0; color: #e3e5e8; }
     .empty-feed { text-align: center; padding: 3rem; background: #2b2d31; border-radius: 20px; border: 1px dashed #4e5058; color: #7e8288; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+    .error-msg { color: #ed4245; text-align: center; padding: 1rem; background: rgba(237, 66, 69, 0.1); border-radius: 12px; margin-top: 1rem; font-size: 0.9rem; }
   </style>
 </head>
 <body>
   <div class="board">
     <header class="board-header">
       <h1>🤢 vomit.gmc</h1>
-      <span class="badge">#cryghanistan</span>
+      <span class="badge">анонимный имиджборд</span>
     </header>
 
     <section class="new-post-form">
       <form id="postForm">
         <div class="form-row">
-          <input type="text" id="authorInput" placeholder="Аноним (или ваш ник)" maxlength="30">
+          <input type="text" id="authorInput" placeholder="Аноним (или ваш ник)" maxlength="30" autocomplete="off">
           <textarea id="textInput" placeholder="Введите сообщение..." required></textarea>
         </div>
         <div class="form-actions">
@@ -54,37 +55,46 @@
           <button type="submit" class="btn btn-primary" id="submitBtn">Отправить</button>
         </div>
       </form>
+      <div id="errorBox"></div>
     </section>
 
     <div class="board-toolbar">
       <span class="post-count" id="postCount">Загрузка...</span>
+      <span>🕒 Новые сверху</span>
     </div>
 
     <main class="posts-feed" id="postsFeed"></main>
   </div>
 
-  <!-- Подключаем Supabase JS -->
+  <!-- Подключаем библиотеку Supabase (v2) -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <script>
-    // ====== НАСТРОЙКИ SUPABASE ======
-    // Вставь сюда свои значения из Project Settings -> API
-    const SUPABASE_URL = 'https://ixeckrmjjwfaghcrmiep.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZWNrcm1qandmYWdoY3JtaWVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTU2MzYxODEsImV4cCI6MjExMTIxMjE4MX0.jtDXNqivgLQTS8JefwFr2s1XpLWSNqphVj14vn0r73Q';
-    // ================================
+    // =========================================================
+    // ⚠️ ВСТАВЬ СЮДА СВОИ КЛЮЧИ ИЗ SUPABASE (Project Settings -> API)
+    // =========================================================
+    const SUPABASE_URL = 'https://ixeckrmjwfaghcrmiep.supabase.co'; // Твой URL
+    const SUPABASE_ANON_KEY = 'sb_publishable_1gEN4w23ZxnYOosQ92_zGw_5oFocx6z'; // Publishable key или anon public
+    // =========================================================
 
-    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // Инициализация клиента. Называем его client, чтобы не конфликтовать с window.supabase
+    const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    // DOM элементы
     const feedEl = document.getElementById('postsFeed');
     const postCountEl = document.getElementById('postCount');
     const postForm = document.getElementById('postForm');
     const authorInput = document.getElementById('authorInput');
     const textInput = document.getElementById('textInput');
     const submitBtn = document.getElementById('submitBtn');
+    const errorBox = document.getElementById('errorBox');
 
-    // Функция экранирования (защита от XSS)
-    function escapeHtml(text) {
-      if (!text) return '';
-      return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    // Функция для защиты от XSS (экранирование HTML)
+    function escapeHTML(str) {
+      if (!str) return '';
+      return str.replace(/[&<>'"]/g, 
+        tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag])
+      );
     }
 
     // Форматирование времени
@@ -98,7 +108,7 @@
       return d.toLocaleDateString('ru-RU');
     }
 
-    // Отрисовка постов
+    // Отрисовка постов на странице
     function renderPosts(posts) {
       if (!posts || posts.length === 0) {
         feedEl.innerHTML = `<div class="empty-feed">✨ Пока нет ни одного поста. Будьте первым!</div>`;
@@ -106,50 +116,50 @@
         return;
       }
 
-      postCountEl.textContent = `${posts.length} ${posts.length === 1 ? 'пост' : (posts.length < 5 ? 'поста' : 'постов')}`;
+      const count = posts.length;
+      postCountEl.textContent = `${count} ${count === 1 ? 'пост' : (count < 5 ? 'поста' : 'постов')}`;
 
       feedEl.innerHTML = posts.map(post => `
         <article class="post-card">
           <div class="post-header">
-            <span class="post-author">👤 ${escapeHtml(post.author || 'Аноним')}</span>
+            <span class="post-author">👤 ${escapeHTML(post.author || 'Аноним')}</span>
             <span class="post-date">🕒 ${formatDate(post.created_at)}</span>
             <span class="post-id">#${post.id}</span>
           </div>
-          <div class="post-text">${escapeHtml(post.text).replace(/\n/g, '<br>')}</div>
+          <div class="post-text">${escapeHTML(post.text).replace(/\n/g, '<br>')}</div>
         </article>
       `).join('');
     }
 
-    // Загрузка начальных данных
-   async function loadPosts() {
-  console.log("Начинаю загрузку постов..."); // Проверка в консоли
-  
-  const { data, error } = await supabase
-    .from('posts')
-    .select('*')
-    .order('created_at', { ascending: false })
-    .abortSignal(AbortSignal.timeout(7000)); // Ждём максимум 7 секунд
+    // Загрузка данных из БД
+    async function loadPosts() {
+      try {
+        // AbortSignal.timeout(10000) — если за 10 сек не ответит, выдаст ошибку
+        const { data, error } = await client
+          .from('posts')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .abortSignal(AbortSignal.timeout(10000));
 
-  if (error) {
-    console.error('ОШИБКА ЗАГРУЗКИ:', error);
-    // Показываем ошибку прямо на сайте
-    feedEl.innerHTML = `<div class="empty-feed">Ошибка: ${error.message}. Проверь консоль (F12).</div>`;
-    postCountEl.textContent = "Ошибка";
-    return;
-  }
-  
-  console.log("Данные получены:", data); // Проверка в консоли
-  renderPosts(data);
-}
+        if (error) throw error;
+        
+        renderPosts(data);
+      } catch (err) {
+        console.error('Ошибка загрузки:', err);
+        feedEl.innerHTML = `<div class="empty-feed">Не удалось загрузить посты. Проверь соединение.</div>`;
+        postCountEl.textContent = 'Ошибка';
+        errorBox.innerHTML = `<div class="error-msg">Ошибка: ${escapeHTML(err.message)}</div>`;
+      }
+    }
 
-    // Подписка на новые посты в реальном времени
-    function subscribeToNewPosts() {
-      supabase
+    // Подписка на новые посты (Realtime)
+    function subscribeToRealtime() {
+      client
         .channel('public:posts')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, payload => {
-          // Когда кто-то в мире отправляет пост, он появляется здесь
-          console.log('Новый пост:', payload.new);
-          loadPosts(); // Перезагружаем ленту (простой способ синхронизации)
+          console.log('Прилетел новый пост:', payload.new);
+          // Перезагружаем ленту, чтобы новый пост встал на свое место (сверху)
+          loadPosts(); 
         })
         .subscribe();
     }
@@ -157,41 +167,49 @@
     // Отправка формы
     postForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+      errorBox.innerHTML = ''; // Очищаем старые ошибки
+      
       const author = authorInput.value.trim() || 'Аноним';
       const text = textInput.value.trim();
 
       if (!text) return;
 
+      // Блокируем кнопку, чтобы не спамили
       submitBtn.disabled = true;
       submitBtn.textContent = 'Отправка...';
 
-      const { error } = await supabase
-        .from('posts')
-        .insert([{ author: author, text: text }]);
+      try {
+        const { error } = await client
+          .from('posts')
+          .insert([{ author: author, text: text }]);
 
-      if (error) {
-        console.error('Ошибка отправки:', error);
-        alert('Не удалось отправить сообщение. Попробуй позже.');
-      } else {
-        textInput.value = ''; // Очищаем поле
+        if (error) throw error;
+
+        // Очищаем поля после успешной отправки
+        textInput.value = '';
         authorInput.value = '';
-        // Лента обновится сама через Realtime подписку, но на всякий случай:
+        
+        // Подписка Realtime сама обновит ленту, но на всякий случай вызовем loadPosts
         loadPosts(); 
+      } catch (err) {
+        console.error('Ошибка отправки:', err);
+        errorBox.innerHTML = `<div class="error-msg">Не удалось отправить: ${escapeHTML(err.message)}</div>`;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Отправить';
       }
-
-      submitBtn.disabled = false;
-      submitBtn.textContent = 'Отправить';
     });
 
-    // Кнопка очистки
+    // Кнопка "Очистить"
     document.getElementById('clearBtn').addEventListener('click', () => {
       textInput.value = '';
       authorInput.value = '';
+      errorBox.innerHTML = '';
     });
 
-    // Инициализация
+    // ЗАПУСК ПРИ ЗАГРУЗКЕ СТРАНИЦЫ
     loadPosts();
-    subscribeToNewPosts();
+    subscribeToRealtime();
   </script>
 </body>
 </html>
