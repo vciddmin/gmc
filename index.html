@@ -203,6 +203,18 @@
     </div>
   </div>
 
+  <!-- Модалка ответа -->
+  <div class="modal-overlay" id="replyModal">
+    <div class="modal-content">
+      <h3>Ответ на пост</h3>
+      <textarea class="modal-search-input" id="replyText" style="min-height: 80px; resize: vertical;" placeholder="Ваш ответ..."></textarea>
+      <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+        <button class="btn btn-outline" id="cancelReply">Отмена</button>
+        <button class="btn btn-primary" id="submitReply">Ответить</button>
+      </div>
+    </div>
+  </div>
+
   <button class="settings-toggle" id="settingsToggle">⚙️</button>
   <div class="settings-panel" id="settingsPanel">
     <div class="settings-header">
@@ -243,7 +255,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // =========================================================
-    // ⚠️ API КЛЮЧИ
+    // ⚠️ ВСТАВЬ СВОИ КЛЮЧИ ЗДЕСЬ
     // =========================================================
     const SUPABASE_URL = 'https://ixeckrmjjwfaghcrmiep.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_1gEN4w23ZxnYOosQ92_zGw_5oFocx6z'; // <--- Твой ключ Supabase
@@ -274,6 +286,8 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
     const sortSelect = document.getElementById('sortSelect');
     const fileInput = document.getElementById('fileInput');
     const fileLabel = document.getElementById('fileLabel');
+    const replyModal = document.getElementById('replyModal');
+    const replyText = document.getElementById('replyText');
 
     function escapeHTML(str) {
       if (!str) return '';
@@ -415,8 +429,8 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
       document.querySelectorAll('.reply-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           replyToPostId = e.target.dataset.id;
-          document.getElementById('replyModal').classList.add('open');
-          document.getElementById('replyText').focus();
+          replyModal.classList.add('open');
+          replyText.focus();
         });
       });
 
@@ -469,7 +483,7 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
       renderPosts();
     }
 
-    // --- Обработка @gif и @pic в поле ввода ---
+    // --- Обработка @gif и @pic ---
     textInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             const val = textInput.value.trim();
@@ -636,7 +650,7 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
     });
 
     document.getElementById('submitReply').addEventListener('click', async () => {
-      const text = document.getElementById('replyText').value.trim();
+      const text = replyText.value.trim();
       if (!text || !replyToPostId) return;
 
       const { error } = await client.from('posts').insert([{ 
@@ -648,13 +662,13 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
 
       if (error) { alert(error.message); return; }
       
-      document.getElementById('replyModal').classList.remove('open');
-      document.getElementById('replyText').value = '';
+      replyModal.classList.remove('open');
+      replyText.value = '';
       replyToPostId = null;
     });
 
     document.getElementById('cancelReply').addEventListener('click', () => {
-      document.getElementById('replyModal').classList.remove('open');
+      replyModal.classList.remove('open');
       replyToPostId = null;
     });
 
