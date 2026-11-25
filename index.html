@@ -540,4 +540,112 @@
             renderPosts();
           } else if (payload.eventType === 'INSERT') {
             allPosts.push(payload.new);
-           
+            renderPosts();
+          }
+        }).subscribe();
+        
+      client.channel('public:boards')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'boards' }, payload => {
+          allBoards.push(payload.new);
+          renderBoards();
+        }).subscribe();
+    }
+
+    const settingsToggle = document.getElementById('settingsToggle');
+    const settingsPanel = document.getElementById('settingsPanel');
+    const closeSettings = document.getElementById('closeSettings');
+    const bgImageInput = document.getElementById('bgImageInput');
+    const boardBgInput = document.getElementById('boardBgInput');
+    const accentColor = document.getElementById('accentColor');
+    const bgCard = document.getElementById('bgCard');
+    const textMain = document.getElementById('textMain');
+    const radiusRange = document.getElementById('radiusRange');
+    const opacityRange = document.getElementById('opacityRange');
+
+    settingsToggle.addEventListener('click', () => settingsPanel.classList.toggle('open'));
+    closeSettings.addEventListener('click', () => settingsPanel.classList.remove('open'));
+
+    searchInput.addEventListener('input', (e) => {
+      currentSearch = e.target.value.toLowerCase();
+      renderPosts();
+    });
+    sortSelect.addEventListener('change', (e) => {
+      currentSort = e.target.value;
+      renderPosts();
+    });
+
+    bgImageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target.result;
+        document.body.style.backgroundImage = `url(${base64})`;
+        localStorage.setItem('vomit_bg', base64);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    boardBgInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const base64 = event.target.result;
+        appContainer.style.backgroundImage = `url(${base64})`;
+        localStorage.setItem('vomit_board_bg', base64);
+      };
+      reader.readAsDataURL(file);
+    });
+
+    const savedBg = localStorage.getItem('vomit_bg');
+    if (savedBg) document.body.style.backgroundImage = `url(${savedBg})`;
+
+    const savedBoardBg = localStorage.getItem('vomit_board_bg');
+    if (savedBoardBg) appContainer.style.backgroundImage = `url(${savedBoardBg})`;
+
+    function applyTheme() {
+      document.documentElement.style.setProperty('--accent', accentColor.value);
+      document.documentElement.style.setProperty('--bg-card', bgCard.value);
+      document.documentElement.style.setProperty('--text-main', textMain.value);
+      document.documentElement.style.setProperty('--radius', radiusRange.value + 'px');
+      document.documentElement.style.setProperty('--board-opacity', opacityRange.value); 
+    }
+    
+    const savedTheme = localStorage.getItem('vomit_theme');
+    if (savedTheme) {
+      const t = JSON.parse(savedTheme);
+      accentColor.value = t.accent; 
+      bgCard.value = t.bgCard; 
+      textMain.value = t.textMain; 
+      radiusRange.value = t.radius;
+      if (t.opacity) opacityRange.value = t.opacity;
+      applyTheme();
+    }
+
+    [accentColor, bgCard, textMain, radiusRange, opacityRange].forEach(el => {
+      el.addEventListener('input', () => {
+        applyTheme();
+        localStorage.setItem('vomit_theme', JSON.stringify({
+          accent: accentColor.value, 
+          bgCard: bgCard.value, 
+          textMain: textMain.value, 
+          radius: radiusRange.value,
+          opacity: opacityRange.value
+        }));
+      });
+    });
+
+    document.getElementById('resetSettings').addEventListener('click', () => {
+      localStorage.removeItem('vomit_theme');
+      localStorage.removeItem('vomit_bg');
+      localStorage.removeItem('vomit_board_bg');
+      location.reload();
+    });
+
+    loadBoards();
+    loadPosts();
+    subscribeToRealtime();
+  </script>
+</body>
+</html>
