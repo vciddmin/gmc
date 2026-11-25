@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>vomit.gmc · #cryghanistan</title>
-  <!-- ИКОНКА САЙТА -->
   <link rel="icon" type="image/x-icon" href="sigil.ico">
   <style>
     :root {
@@ -25,16 +24,11 @@
       content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.6); z-index: -1; backdrop-filter: blur(3px);
     }
-
     .app-container { 
       display: flex; width: 100%; max-width: 1200px; 
-      background: var(--bg-board); 
-      box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-      transition: background 0.3s, opacity 0.3s;
-      z-index: 1; 
-      opacity: var(--board-opacity); 
-      position: relative;
-      background-size: cover; background-position: center; background-repeat: no-repeat;
+      background: var(--bg-board); box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+      transition: background 0.3s, opacity 0.3s; z-index: 1; opacity: var(--board-opacity); 
+      position: relative; background-size: cover; background-position: center; background-repeat: no-repeat;
     }
     .app-container::before {
       content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
@@ -42,7 +36,6 @@
     }
     .sidebar, .main-content { position: relative; z-index: 2; }
     
-    /* Сайдбар */
     .sidebar { width: 240px; background: var(--bg-sidebar); padding: 2rem 1rem; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.5rem; flex-shrink: 0; }
     .sidebar-logo { font-size: 1.4rem; font-weight: 700; color: #f2f3f5; margin-bottom: 1.5rem; padding-left: 0.5rem; }
     .board-list { display: flex; flex-direction: column; gap: 0.3rem; overflow-y: auto; max-height: 60vh; }
@@ -52,10 +45,7 @@
     .add-board-btn { margin-top: 1rem; background: var(--bg-card); border: 1px dashed var(--border-color); padding: 0.8rem; border-radius: 10px; color: var(--text-main); cursor: pointer; text-align: center; font-size: 0.9rem; }
     .add-board-btn:hover { border-color: var(--accent); }
 
-    /* Контент */
     .main-content { flex: 1; padding: 2rem; display: flex; flex-direction: column; max-height: 100vh; overflow-y: auto; }
-    
-    /* Шапка и Инструменты */
     .header { border-bottom: 2px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem; }
     .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
     .header-top h1 { font-size: 1.6rem; font-weight: 600; }
@@ -65,7 +55,6 @@
     .search-input:focus { border-color: var(--accent); }
     .sort-select { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.6rem 1rem; border-radius: 8px; outline: none; cursor: pointer; }
 
-    /* Форма */
     .new-post-form { background: var(--bg-card); border-radius: var(--radius); padding: 1.2rem; margin-bottom: 2rem; border: 1px solid var(--border-color); }
     .form-row { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1rem; }
     .form-row input, .form-row textarea { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 10px; outline: none; }
@@ -75,7 +64,6 @@
     .btn-primary:hover { filter: brightness(0.9); }
     .btn-outline { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); }
 
-    /* Посты */
     .posts-feed { display: flex; flex-direction: column; gap: 1rem; }
     .post-node { display: flex; flex-direction: column; gap: 0.5rem; }
     .post-card { background: var(--bg-card); border-radius: var(--radius); padding: 1rem; border: 1px solid var(--border-color); }
@@ -88,7 +76,6 @@
     .reply-btn { cursor: pointer; color: var(--accent); font-weight: 500; background: none; border: none; padding: 0; font-size: 0.85rem; }
     .reply-btn:hover { text-decoration: underline; }
     
-    /* РЕАКЦИИ */
     .reactions { display: flex; gap: 0.5rem; margin-left: auto; }
     .reaction-btn { background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.2rem 0.6rem; border-radius: 20px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.85rem; transition: 0.2s; }
     .reaction-btn:hover { border-color: var(--accent); }
@@ -96,14 +83,12 @@
 
     .children-container { margin-left: 1.5rem; padding-left: 1rem; border-left: 2px solid var(--border-color); display: flex; flex-direction: column; gap: 0.8rem; margin-top: 0.5rem; }
 
-    /* Модалка */
     .reply-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; justify-content: center; align-items: center; }
     .reply-modal.open { display: flex; }
     .modal-content { background: var(--bg-card); padding: 1.5rem; border-radius: var(--radius); width: 100%; max-width: 500px; border: 1px solid var(--border-color); }
     .modal-content h3 { margin-bottom: 1rem; font-size: 1.1rem; }
     .modal-textarea { width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 10px; min-height: 80px; margin-bottom: 1rem; resize: vertical; }
 
-    /* Настройки */
     .settings-toggle { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; }
     .settings-panel { position: fixed; top: 0; right: -350px; width: 320px; height: 100vh; background: var(--bg-sidebar); border-left: 1px solid var(--border-color); padding: 2rem 1.5rem; box-shadow: -5px 0 20px rgba(0,0,0,0.5); z-index: 1001; transition: right 0.3s; overflow-y: auto; }
     .settings-panel.open { right: 0; }
@@ -145,12 +130,11 @@
           <h1 id="boardTitle">Загрузка...</h1>
           <span id="postCount" style="color: var(--text-muted); font-size: 0.9rem;"></span>
         </div>
-        <!-- ПАНЕЛЬ ПОИСКА И СОРТИРОВКИ -->
         <div class="toolbar">
           <input type="text" id="searchInput" class="search-input" placeholder="🔍 Поиск по сообщениям...">
           <select id="sortSelect" class="sort-select">
             <option value="newest">🕒 Сначала новые</option>
-            <option value="popular">🔥 Самые популярные</option>
+            <option value="popular">🔥 Полный разъебчик</option>
             <option value="liked">❤️ Самые залайканные</option>
           </select>
         </div>
@@ -174,7 +158,6 @@
     </main>
   </div>
 
-  <!-- Модалка ответа -->
   <div class="reply-modal" id="replyModal">
     <div class="modal-content">
       <h3>Ответ на пост</h3>
@@ -186,7 +169,6 @@
     </div>
   </div>
 
-  <!-- Настройки -->
   <button class="settings-toggle" id="settingsToggle">⚙️</button>
   <div class="settings-panel" id="settingsPanel">
     <div class="settings-header">
@@ -228,16 +210,10 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // =========================================================
-    // ⚠️ ВСТАВЬ СЮДА СВОЙ КЛЮЧ
-    // =========================================================
     const SUPABASE_URL = 'https://ixeckrmjjwfaghcrmiep.supabase.co'; 
     const SUPABASE_ANON_KEY = 'sb_publishable_1gEN4w23ZxnYOosQ92_zGw_5oFocx6z'; // <--- ЗАМЕНИ ЭТО
-    // =========================================================
-
     const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Состояние
     let currentBoard = 'random';
     let allPosts = [];
     let allBoards = [];
@@ -245,7 +221,6 @@
     let currentSearch = '';
     let currentSort = 'newest';
 
-    // DOM
     const boardListEl = document.getElementById('boardList');
     const feedEl = document.getElementById('postsFeed');
     const postCountEl = document.getElementById('postCount');
@@ -257,12 +232,9 @@
     const replyModal = document.getElementById('replyModal');
     const replyText = document.getElementById('replyText');
     const appContainer = document.getElementById('appContainer');
-    
-    // Поиск и сортировка
     const searchInput = document.getElementById('searchInput');
     const sortSelect = document.getElementById('sortSelect');
 
-    // --- Хелперы ---
     function escapeHTML(str) {
       if (!str) return '';
       return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
@@ -278,7 +250,6 @@
       return d.toLocaleDateString('ru-RU');
     }
 
-    // --- Загрузка веток ---
     async function loadBoards() {
       const { data, error } = await client.from('boards').select('*').order('id', { ascending: true });
       if (error) { console.error(error); return; }
@@ -304,7 +275,6 @@
       });
     }
 
-    // --- Создание ветки ---
     document.getElementById('addBoardBtn').addEventListener('click', async () => {
       const name = prompt('Введите название новой ветки (на английском, без пробелов):');
       if (!name) return;
@@ -318,7 +288,6 @@
       if (newBtn) newBtn.click();
     });
 
-    // --- Дерево постов ---
     function buildTree(posts) {
       const map = {};
       const roots = [];
@@ -336,18 +305,15 @@
     function renderPosts() {
       let filtered = allPosts.filter(p => p.board === currentBoard);
       
-      // ПРИМЕНЯЕМ ПОИСК
       if (currentSearch) {
         filtered = filtered.filter(p => p.text.toLowerCase().includes(currentSearch) || p.author.toLowerCase().includes(currentSearch));
       }
 
-      // ПРИМЕНЯЕМ СОРТИРОВКУ
       if (currentSort === 'popular') {
         filtered.sort((a, b) => (b.likes - b.dislikes) - (a.likes - a.dislikes));
       } else if (currentSort === 'liked') {
         filtered.sort((a, b) => b.likes - a.likes);
       } else {
-        // newest (по умолчанию) - по времени создания
         filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
       }
 
@@ -366,7 +332,6 @@
           ? `<div class="children-container">${node.children.map(renderNode).join('')}</div>` 
           : '';
         
-        // Проверяем, лайкал ли этот пользователь (храним в localStorage)
         const likedPosts = JSON.parse(localStorage.getItem('vomit_liked') || '[]');
         const dislikedPosts = JSON.parse(localStorage.getItem('vomit_disliked') || '[]');
         const isLiked = likedPosts.includes(node.id) ? 'liked' : '';
@@ -400,7 +365,6 @@
 
       feedEl.innerHTML = tree.map(renderNode).join('');
 
-      // Обработчики кнопок
       document.querySelectorAll('.reply-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           replyToPostId = e.target.dataset.id;
@@ -409,7 +373,6 @@
         });
       });
 
-      // Обработчики реакций
       document.querySelectorAll('.like-btn, .dislike-btn').forEach(btn => {
         btn.addEventListener('click', async (e) => {
           const id = parseInt(e.currentTarget.dataset.id);
@@ -422,11 +385,9 @@
 
           if (action === 'like') {
             if (liked.includes(id)) {
-              // Убираем лайк
               liked = liked.filter(x => x !== id);
               await client.from('posts').update({ likes: Math.max(0, post.likes - 1) }).eq('id', id);
             } else {
-              // Ставим лайк
               liked.push(id);
               if (disliked.includes(id)) {
                 disliked = disliked.filter(x => x !== id);
@@ -450,12 +411,10 @@
 
           localStorage.setItem('vomit_liked', JSON.stringify(liked));
           localStorage.setItem('vomit_disliked', JSON.stringify(disliked));
-          // Обновление произойдет через Realtime
         });
       });
     }
 
-    // --- Загрузка постов ---
     async function loadPosts() {
       const { data, error } = await client.from('posts').select('*').order('created_at', { ascending: true });
       if (error) { console.error(error); return; }
@@ -463,7 +422,6 @@
       renderPosts();
     }
 
-    // --- Отправка поста ---
     postForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const author = authorInput.value.trim() || 'Аноним';
@@ -484,7 +442,6 @@
       submitBtn.textContent = 'Отправить';
     });
 
-    // --- Отправка ответа ---
     document.getElementById('submitReply').addEventListener('click', async () => {
       const text = replyText.value.trim();
       if (!text || !replyToPostId) return;
@@ -508,18 +465,14 @@
       replyToPostId = null;
     });
 
-    // --- Realtime ---
     function subscribeToRealtime() {
       client.channel('public:posts')
         .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, payload => {
-          // Если обновление (лайк/дизлайк)
           if (payload.eventType === 'UPDATE') {
             const index = allPosts.findIndex(p => p.id === payload.new.id);
             if (index !== -1) allPosts[index] = payload.new;
             renderPosts();
-          } 
-          // Если добавление
-          else if (payload.eventType === 'INSERT') {
+          } else if (payload.eventType === 'INSERT') {
             allPosts.push(payload.new);
             renderPosts();
           }
@@ -532,7 +485,6 @@
         }).subscribe();
     }
 
-    // --- ТЕМА И ФОН ---
     const settingsToggle = document.getElementById('settingsToggle');
     const settingsPanel = document.getElementById('settingsPanel');
     const closeSettings = document.getElementById('closeSettings');
@@ -544,11 +496,9 @@
     const radiusRange = document.getElementById('radiusRange');
     const opacityRange = document.getElementById('opacityRange');
 
-    // Открытие/закрытие настроек
     settingsToggle.addEventListener('click', () => settingsPanel.classList.toggle('open'));
     closeSettings.addEventListener('click', () => settingsPanel.classList.remove('open'));
 
-    // Слушатели поиска и сортировки
     searchInput.addEventListener('input', (e) => {
       currentSearch = e.target.value.toLowerCase();
       renderPosts();
@@ -558,7 +508,6 @@
       renderPosts();
     });
 
-    // Фоны
     bgImageInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -589,8 +538,48 @@
     const savedBoardBg = localStorage.getItem('vomit_board_bg');
     if (savedBoardBg) appContainer.style.backgroundImage = `url(${savedBoardBg})`;
 
-    // Тема
     function applyTheme() {
       document.documentElement.style.setProperty('--accent', accentColor.value);
       document.documentElement.style.setProperty('--bg-card', bgCard.value);
-      document.documentElement.style.setProperty('--text
+      document.documentElement.style.setProperty('--text-main', textMain.value);
+      document.documentElement.style.setProperty('--radius', radiusRange.value + 'px');
+      document.documentElement.style.setProperty('--board-opacity', opacityRange.value); 
+    }
+    
+    const savedTheme = localStorage.getItem('vomit_theme');
+    if (savedTheme) {
+      const t = JSON.parse(savedTheme);
+      accentColor.value = t.accent; 
+      bgCard.value = t.bgCard; 
+      textMain.value = t.textMain; 
+      radiusRange.value = t.radius;
+      if (t.opacity) opacityRange.value = t.opacity;
+      applyTheme();
+    }
+
+    [accentColor, bgCard, textMain, radiusRange, opacityRange].forEach(el => {
+      el.addEventListener('input', () => {
+        applyTheme();
+        localStorage.setItem('vomit_theme', JSON.stringify({
+          accent: accentColor.value, 
+          bgCard: bgCard.value, 
+          textMain: textMain.value, 
+          radius: radiusRange.value,
+          opacity: opacityRange.value
+        }));
+      });
+    });
+
+    document.getElementById('resetSettings').addEventListener('click', () => {
+      localStorage.removeItem('vomit_theme');
+      localStorage.removeItem('vomit_bg');
+      localStorage.removeItem('vomit_board_bg');
+      location.reload();
+    });
+
+    loadBoards();
+    loadPosts();
+    subscribeToRealtime();
+  </script>
+</body>
+</html>
