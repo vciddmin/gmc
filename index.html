@@ -10,6 +10,7 @@
       --bg-card: #2b2d31; --bg-input: #1e1f22; --text-main: #e3e5e8;
       --text-muted: #949ba4; --accent: #5865f2; --border-color: #313338;
       --radius: 16px; --font-main: system-ui, 'Segoe UI', Roboto, sans-serif;
+      --board-opacity: 0.95; /* Переменная для прозрачности */
     }
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: var(--font-main); }
     body { 
@@ -23,7 +24,14 @@
       content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(0,0,0,0.6); z-index: -1; backdrop-filter: blur(3px);
     }
-    .app-container { display: flex; width: 100%; max-width: 1200px; background: var(--bg-board); box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: background 0.3s; z-index: 1; }
+    .app-container { 
+      display: flex; width: 100%; max-width: 1200px; 
+      background: var(--bg-board); 
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+      transition: background 0.3s, opacity 0.3s; /* Добавили transition для opacity */
+      z-index: 1; 
+      opacity: var(--board-opacity); /* Применяем прозрачность */
+    }
     
     /* Сайдбар */
     .sidebar { width: 240px; background: var(--bg-sidebar); padding: 2rem 1rem; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.5rem; flex-shrink: 0; transition: background 0.3s; }
@@ -142,33 +150,45 @@
   <button class="settings-toggle" id="settingsToggle">⚙️</button>
   <div class="settings-panel" id="settingsPanel">
     <h2>Настройки дизайна</h2>
+    
     <div class="setting-group">
       <label>Фон сайта (Картинка / Гифка)</label>
       <input type="file" id="bgImageInput" accept="image/*">
     </div>
+    
     <div class="setting-group">
       <label>Основной цвет</label>
       <input type="color" id="accentColor" value="#5865f2">
     </div>
+    
     <div class="setting-group">
       <label>Фон карточек</label>
       <input type="color" id="bgCard" value="#2b2d31">
     </div>
+    
     <div class="setting-group">
       <label>Цвет текста</label>
       <input type="color" id="textMain" value="#e3e5e8">
     </div>
+    
     <div class="setting-group">
       <label>Скругление углов (px)</label>
       <input type="range" id="radiusRange" min="0" max="30" value="16">
     </div>
+
+    <!-- НОВЫЙ ПОЛЗУНОК ПРОЗРАЧНОСТИ -->
+    <div class="setting-group">
+      <label>Прозрачность борда</label>
+      <input type="range" id="opacityRange" min="0.1" max="1" step="0.05" value="0.95">
+    </div>
+    
     <button class="btn btn-primary" style="width:100%; margin-top: 1rem;" id="resetSettings">Сбросить настройки</button>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // =========================================================
-    // ⚠️ ВСТАВЬ СЮДА СВОЙ КЛЮЧ (Publishable key / anon)
+    // ⚠️ ВСТАВЬ СЮДА СВОЙ КЛЮЧ (Project Settings -> API -> Publishable key / anon)
     // =========================================================
     const SUPABASE_URL = 'https://ixeckrmjjwfaghcrmiep.supabase.co'; 
     const SUPABASE_ANON_KEY = 'sb_publishable_1gEN4w23ZxnYOosQ92_zGw_5oFocx6z'; // <--- ЗАМЕНИ ЭТО
@@ -249,7 +269,6 @@
       if (error) return alert('Ошибка: ' + error.message);
       
       await loadBoards();
-      // Переключаемся на новую ветку
       const newBtn = document.querySelector(`.board-btn[data-board="${cleanName}"]`);
       if (newBtn) newBtn.click();
     });
@@ -305,7 +324,6 @@
 
       feedEl.innerHTML = tree.map(renderNode).join('');
 
-      // Привязка кнопок ответа
       document.querySelectorAll('.reply-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           replyToPostId = e.target.dataset.id;
@@ -391,10 +409,11 @@
     const bgCard = document.getElementById('bgCard');
     const textMain = document.getElementById('textMain');
     const radiusRange = document.getElementById('radiusRange');
+    const opacityRange = document.getElementById('opacityRange'); // Новый элемент
 
     settingsToggle.addEventListener('click', () => settingsPanel.classList.toggle('open'));
 
-    // Фон (сохраняем картинку в IndexedDB, чтобы не грузить базу)
+    // Фон
     bgImageInput.addEventListener('change', (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -407,31 +426,39 @@
       reader.readAsDataURL(file);
     });
 
-    // Загрузка сохраненного фона
     const savedBg = localStorage.getItem('vomit_bg');
     if (savedBg) document.body.style.backgroundImage = `url(${savedBg})`;
 
-    // Цвета
+    // Цвета и прозрачность
     function applyTheme() {
       document.documentElement.style.setProperty('--accent', accentColor.value);
       document.documentElement.style.setProperty('--bg-card', bgCard.value);
       document.documentElement.style.setProperty('--text-main', textMain.value);
       document.documentElement.style.setProperty('--radius', radiusRange.value + 'px');
+      document.documentElement.style.setProperty('--board-opacity', opacityRange.value); // Применяем прозрачность
     }
     
-    // Восстановление цветов
+    // Восстановление
     const savedTheme = localStorage.getItem('vomit_theme');
     if (savedTheme) {
       const t = JSON.parse(savedTheme);
-      accentColor.value = t.accent; bgCard.value = t.bgCard; textMain.value = t.textMain; radiusRange.value = t.radius;
+      accentColor.value = t.accent; 
+      bgCard.value = t.bgCard; 
+      textMain.value = t.textMain; 
+      radiusRange.value = t.radius;
+      if (t.opacity) opacityRange.value = t.opacity; // Восстанавливаем прозрачность
       applyTheme();
     }
 
-    [accentColor, bgCard, textMain, radiusRange].forEach(el => {
+    [accentColor, bgCard, textMain, radiusRange, opacityRange].forEach(el => {
       el.addEventListener('input', () => {
         applyTheme();
         localStorage.setItem('vomit_theme', JSON.stringify({
-          accent: accentColor.value, bgCard: bgCard.value, textMain: textMain.value, radius: radiusRange.value
+          accent: accentColor.value, 
+          bgCard: bgCard.value, 
+          textMain: textMain.value, 
+          radius: radiusRange.value,
+          opacity: opacityRange.value // Сохраняем прозрачность
         }));
       });
     });
