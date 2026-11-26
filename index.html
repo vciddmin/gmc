@@ -249,7 +249,6 @@
       <button class="modal-close" id="closeAdmin">×</button>
     </div>
     
-    <!-- Форма входа -->
     <div class="admin-login" id="adminLogin">
       <h3>Введите секретный код</h3>
       <input type="password" id="adminPassword" placeholder="Пароль...">
@@ -257,20 +256,16 @@
       <p id="loginError" style="color: #ed4245; font-size: 0.9rem;"></p>
     </div>
 
-    <!-- Контент админки -->
     <div id="adminContent" style="display: none; flex-direction: column; height: 100%;">
       <div class="admin-tabs">
         <div class="admin-tab active" data-tab="posts">Посты</div>
         <div class="admin-tab" data-tab="boards">Ветки</div>
         <div class="admin-tab" data-tab="users">Пользователи</div>
       </div>
-      <div class="admin-content" id="adminTabContent">
-        <!-- Сюда рендерится список -->
-      </div>
+      <div class="admin-content" id="adminTabContent"></div>
     </div>
   </div>
 
-  <!-- Настройки дизайна -->
   <button class="settings-toggle" id="settingsToggle">⚙️</button>
   <div class="settings-panel" id="settingsPanel">
     <div class="settings-header">
@@ -318,7 +313,7 @@ const SUPABASE_ANON_KEY = 'sb_publishable_1gEN4w23ZxnYOosQ92_zGw_5oFocx6z'; // <
 const GIPHY_API_KEY = 'aiNLKrZ1xjoCGIyCjUoxfGrtAHI5W1w2'; // <--- Вставь ключ Giphy
 const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <--- Вставь ключ Unsplash (если есть)
     
-    // СЕКРЕТНЫЙ КОД ДЛЯ АДМИНКИ (поменяй на свой!)
+    // СЕКРЕТНЫЙ КОД ДЛЯ АДМИНКИ
     const ADMIN_PASSWORD = 'sigil_master_666'; 
     // =========================================================
 
@@ -784,7 +779,6 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
             `).join('') || '<p style="color: var(--text-muted);">Веток нет</p>';
         }
         else if (currentAdminTab === 'users') {
-            // Собираем уникальные ники
             const users = [...new Set(allPosts.map(p => p.author || 'Аноним'))];
             adminTabContent.innerHTML = users.map(u => `
                 <div class="admin-list-item">
@@ -798,15 +792,14 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
         }
     }
 
+    // УДАЛЕНИЕ БЕЗ CONFIRM
     window.deletePost = async (id) => {
-        if (!confirm('Удалить этот пост?')) return;
         const { error } = await client.from('posts').delete().eq('id', id);
         if (error) alert('Ошибка: ' + error.message);
         else renderAdminContent();
     };
 
     window.deleteBoard = async (name) => {
-        if (!confirm(`Удалить ветку /${name}/ и ВСЕ её посты?`)) return;
         const { error } = await client.from('boards').delete().eq('name', name);
         if (error) alert('Ошибка: ' + error.message);
         else {
@@ -819,7 +812,6 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
     };
 
     window.deleteUserPosts = async (authorName) => {
-        if (!confirm(`Удалить ВСЕ посты пользователя "${authorName}"?`)) return;
         const { error } = await client.from('posts').delete().eq('author', authorName);
         if (error) alert('Ошибка: ' + error.message);
         else renderAdminContent();
