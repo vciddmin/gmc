@@ -133,50 +133,54 @@
     .setting-group input[type="color"] { height: 35px; cursor: pointer; }
     .setting-group input[type="file"] { font-size: 0.8rem; cursor: pointer; }
 
-    /* Стили для игры */
-        /* Стили для игры */
+       /* Стили для игры */
     #gameGrid {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
-      gap: 2px;
-      background: #2b2d31;
-      padding: 5px;
-      border-radius: 8px;
-      width: 320px;
-      height: 320px;
+      gap: 4px;
+      background: #1e1f22;
+      padding: 8px;
+      border-radius: 12px;
+      width: 100%;
+      aspect-ratio: 1;
+      max-width: 360px;
       margin: 0 auto;
     }
     .game-cell {
-      background: #313338;
-      border-radius: 4px;
-      width: 100%;
-      height: 100%;
-      min-width: 0;  /* Важно, чтобы не вылезало за границы */
-      min-height: 0;
-      transition: background 0.1s;
+      background: #2b2d31;
+      border-radius: 6px;
+      aspect-ratio: 1;
+      transition: background 0.1s, box-shadow 0.1s;
     }
     .game-cell.filled {
       background: var(--accent);
-      box-shadow: inset 0 0 5px rgba(255,255,255,0.5);
+      box-shadow: inset 0 0 8px rgba(255,255,255,0.2), 0 0 5px rgba(88,101,242,0.5);
+    }
+    .game-cell.preview {
+      background: rgba(88, 101, 242, 0.3);
+      box-shadow: inset 0 0 0 2px var(--accent);
     }
     .game-piece {
       display: grid;
       gap: 2px;
-      cursor: pointer;
-      transition: transform 0.1s;
-      padding: 5px;
-      background: #232428;
+      cursor: grab;
+      transition: transform 0.1s, filter 0.1s;
+      padding: 4px;
+      background: #2b2d31;
       border-radius: 8px;
+      border: 1px solid #3c3f45;
     }
-    .game-piece:hover {
-      transform: scale(1.1);
+    .game-piece:active {
+      cursor: grabbing;
+      transform: scale(0.95);
     }
     .game-piece .game-cell {
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
     }
     .game-piece .game-cell.filled {
       background: #ed4245;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
     }
     @media (max-width: 768px) {
       .app-container { flex-direction: column; }
@@ -1039,6 +1043,9 @@
     // ==========================================
     // ИГРА BLOCK BLAST
     // ==========================================
+       // ==========================================
+    // ИГРА BLOCK BLAST (С ПЕРЕТАСКИВАНИЕМ)
+    // ==========================================
     const gameModal = document.getElementById('gameModal');
     const gameGrid = document.getElementById('gameGrid');
     const gamePieces = document.getElementById('gamePieces');
@@ -1050,13 +1057,14 @@
     let score = 0;
     let highScore = parseInt(localStorage.getItem('vomit_highscore') || '0');
     let currentPieces = [];
-    let selectedPieceIndex = null;
-
+    let draggedPiece = null;
+    let draggedElement = null;
+    
     gameHighScoreEl.textContent = highScore;
 
-     document.getElementById('openGameBtn').addEventListener('click', () => {
+    // Открытие игры
+    document.getElementById('openGameBtn').addEventListener('click', () => {
         gameModal.classList.add('open');
-        // Небольшая задержка, чтобы модалка успела отрисоваться
         setTimeout(() => {
             renderGrid();
             renderPieces();
@@ -1077,16 +1085,19 @@
         }
     }
 
+    // Фигуры (все возможные комбинации)
     const shapes = [
         [[1]], [[1,1]], [[1],[1]], 
         [[1,1],[1,1]], [[1,1,1]], [[1],[1],[1]],
         [[1,0],[1,1]], [[0,1],[1,1]],
-        [[1,1,0],[0,1,1]]
+        [[1,1,0],[0,1,1]], [[0,1,1],[1,1,0]],
+        [[1,0],[1,0],[1,1]], [[1,1],[1,0],[1,0]],
+        [[1,1,1],[1,0,0]], [[1,0,0],[1,1,1]]
     ];
 
     function generatePiece() {
         const shape = shapes[Math.floor(Math.random() * shapes.length)];
-        return { shape: shape, color: 'filled' };
+        return { shape: shape };
     }
 
     function renderPieces() {
@@ -1105,35 +1116,72 @@
                     pieceEl.appendChild(c);
                 });
             });
-            pieceEl.addEventListener('click', () => selectPiece(index));
+            // Используем HTML5 Drag and Drop
+            pieceEl.draggable = true;
+            pieceEl.dataset.index = index;
+            pieceEl.addEventListener('dragstart', handleDragStart);
+            pieceEl.addEventListener('dragend', handleDragEnd);
             gamePieces.appendChild(pieceEl);
         });
     }
 
-    function selectPiece(index) {
-        selectedPieceIndex = index;
-        document.querySelectorAll('.game-piece').forEach((el, i) => {
-            el.style.border = i === index ? '2px solid white' : 'none';
-        });
+    // --- Drag & Drop логика ---
+    function handleDragStart(e) {
+        draggedPiece = currentPieces[this.dataset.index];
+        draggedElement = this;
+        e.dataTransfer.setData('text/plain', ''); // Нужно для работы DnD
+        e.dataTransfer.effectAllowed = 'move';
+        this.style.opacity = '0.5';
     }
 
-    gameGrid.addEventListener('click', (e) => {
-        if (selectedPieceIndex === null) return;
+    function handleDragEnd(e) {
+        this.style.opacity = '1';
+        draggedPiece = null;
+        draggedElement = null;
+        clearPreview();
+    }
+
+    // Обработка перетаскивания над сеткой
+    gameGrid.addEventListener('dragover', (e) => {
+        e.preventDefault(); // Разрешаем дроп
+        e.dataTransfer.dropEffect = 'move';
+        
         const cell = e.target.closest('.game-cell');
-        if (!cell) return;
-        const r = parseInt(cell.dataset.r);
-        const c = parseInt(cell.dataset.c);
-        const piece = currentPieces[selectedPieceIndex];
-        if (canPlace(piece.shape, r, c)) {
-            placePiece(piece.shape, r, c);
-            currentPieces.splice(selectedPieceIndex, 1);
-            selectedPieceIndex = null;
-            renderGrid();
-            renderPieces();
-            checkLines();
+        if (cell && draggedPiece) {
+            const r = parseInt(cell.dataset.r);
+            const c = parseInt(cell.dataset.c);
+            showPreview(draggedPiece.shape, r, c);
         }
     });
 
+    gameGrid.addEventListener('dragleave', () => {
+        clearPreview();
+    });
+
+    gameGrid.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const cell = e.target.closest('.game-cell');
+        if (cell && draggedPiece && draggedElement) {
+            const r = parseInt(cell.dataset.r);
+            const c = parseInt(cell.dataset.c);
+            
+            if (canPlace(draggedPiece.shape, r, c)) {
+                placePiece(draggedPiece.shape, r, c);
+                
+                // Удаляем использованную фигуру
+                const index = parseInt(draggedElement.dataset.index);
+                currentPieces.splice(index, 1);
+                
+                renderGrid();
+                renderPieces();
+                checkLines();
+                checkGameOver();
+            }
+        }
+        clearPreview();
+    });
+
+    // --- Логика игры ---
     function canPlace(shape, row, col) {
         for (let r = 0; r < shape.length; r++) {
             for (let c = 0; c < shape[r].length; c++) {
@@ -1157,9 +1205,11 @@
 
     function checkLines() {
         let cleared = 0;
+        // Проверка строк
         for (let r = 0; r < 8; r++) {
             if (grid[r].every(cell => cell === 1)) { grid[r] = Array(8).fill(0); cleared++; }
         }
+        // Проверка столбцов
         for (let c = 0; c < 8; c++) {
             let full = true;
             for (let r = 0; r < 8; r++) { if (grid[r][c] === 0) { full = false; break; } }
@@ -1171,6 +1221,51 @@
             renderGrid();
             setTimeout(checkLines, 200);
         }
+    }
+
+    // Проверка на Game Over (если ни одна фигура не влезает)
+    function checkGameOver() {
+        if (currentPieces.length === 0) return;
+        
+        let canPlaceAny = false;
+        for (let piece of currentPieces) {
+            for (let r = 0; r < 8; r++) {
+                for (let c = 0; c < 8; c++) {
+                    if (canPlace(piece.shape, r, c)) {
+                        canPlaceAny = true;
+                        break;
+                    }
+                }
+                if (canPlaceAny) break;
+            }
+            if (canPlaceAny) break;
+        }
+        
+        if (!canPlaceAny) {
+            setTimeout(() => {
+                alert(`Игра окончена! Твой счёт: ${score}`);
+                resetGameBtn.click();
+            }, 100);
+        }
+    }
+
+    // Подсветка призрака при перетаскивании
+    function showPreview(shape, row, col) {
+        clearPreview();
+        if (!canPlace(shape, row, col)) return;
+        
+        for (let r = 0; r < shape.length; r++) {
+            for (let c = 0; c < shape[r].length; c++) {
+                if (shape[r][c]) {
+                    const cell = gameGrid.querySelector(`.game-cell[data-r="${row + r}"][data-c="${col + c}"]`);
+                    if (cell) cell.classList.add('preview');
+                }
+            }
+        }
+    }
+
+    function clearPreview() {
+        document.querySelectorAll('.game-cell.preview').forEach(el => el.classList.remove('preview'));
     }
 
     function updateScore() {
@@ -1186,18 +1281,7 @@
         grid = Array(8).fill(null).map(() => Array(8).fill(0));
         score = 0;
         currentPieces = [];
-        selectedPieceIndex = null;
         updateScore();
         renderGrid();
         renderPieces();
     });
-
-    // --- Инициализация ---
-    renderGrid();
-    renderPieces();
-    loadBoards();
-    loadPosts();
-    subscribeToRealtime();
-  </script>
-</body>
-</html>
