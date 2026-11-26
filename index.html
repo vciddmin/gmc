@@ -101,39 +101,7 @@
     .media-result:hover { border-color: var(--accent); }
     .media-result img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-    /* АДМИН ПАНЕЛЬ */
-    .admin-toggle { position: fixed; bottom: 20px; right: 80px; width: 50px; height: 50px; border-radius: 50%; background: #faa61a; color: white; border: none; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-    .admin-toggle:hover { transform: scale(1.1); }
-    .admin-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 800px; height: 80vh; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: 0 10px 40px rgba(0,0,0,0.8); z-index: 4000; flex-direction: column; overflow: hidden; }
-    .admin-panel.open { display: flex; }
-    .admin-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--border-color); background: var(--bg-card); }
-    .admin-header h2 { font-size: 1.3rem; color: #faa61a; }
-    .admin-tabs { display: flex; border-bottom: 1px solid var(--border-color); background: var(--bg-card); }
-    .admin-tab { flex: 1; padding: 1rem; text-align: center; cursor: pointer; color: var(--text-muted); font-weight: 500; border-bottom: 2px solid transparent; transition: 0.2s; }
-    .admin-tab:hover { background: var(--bg-input); color: var(--text-main); }
-    .admin-tab.active { color: #faa61a; border-bottom-color: #faa61a; }
-    .admin-content { flex: 1; overflow-y: auto; padding: 1.5rem; }
-    .admin-list-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-input); padding: 1rem; border-radius: 10px; margin-bottom: 0.8rem; border: 1px solid var(--border-color); }
-    .admin-list-item-info { display: flex; flex-direction: column; gap: 0.3rem; overflow: hidden; }
-    .admin-list-item-title { font-weight: 600; font-size: 0.95rem; color: var(--text-main); }
-    .admin-list-item-desc { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px; }
-    .admin-login { padding: 3rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; height: 100%; }
-    .admin-login input { max-width: 300px; width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px; outline: none; text-align: center; }
-
-    /* Настройки */
-    .settings-toggle { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-    .settings-panel { position: fixed; top: 0; right: -350px; width: 320px; height: 100vh; background: var(--bg-sidebar); border-left: 1px solid var(--border-color); padding: 2rem 1.5rem; box-shadow: -5px 0 20px rgba(0,0,0,0.5); z-index: 1001; transition: right 0.3s; overflow-y: auto; }
-    .settings-panel.open { right: 0; }
-    .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-    .settings-header h2 { font-size: 1.3rem; color: var(--text-main); margin: 0; }
-    .close-settings { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
-    .setting-group { margin-bottom: 1.2rem; }
-    .setting-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.3rem; }
-    .setting-group input[type="color"], .setting-group input[type="file"], .setting-group input[type="range"] { width: 100%; padding: 0.4rem; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; }
-    .setting-group input[type="color"] { height: 35px; cursor: pointer; }
-    .setting-group input[type="file"] { font-size: 0.8rem; cursor: pointer; }
-
-       /* Стили для игры */
+    /* СТИЛИ ДЛЯ ИГРЫ BLOCK BLAST */
     #gameGrid {
       display: grid;
       grid-template-columns: repeat(8, 1fr);
@@ -142,8 +110,8 @@
       padding: 8px;
       border-radius: 12px;
       width: 100%;
-      aspect-ratio: 1;
       max-width: 360px;
+      aspect-ratio: 1;
       margin: 0 auto;
     }
     .game-cell {
@@ -182,6 +150,39 @@
       background: #ed4245;
       box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
     }
+
+    /* АДМИН ПАНЕЛЬ */
+    .admin-toggle { position: fixed; bottom: 20px; right: 80px; width: 50px; height: 50px; border-radius: 50%; background: #faa61a; color: white; border: none; font-size: 1.2rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+    .admin-toggle:hover { transform: scale(1.1); }
+    .admin-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 800px; height: 80vh; background: var(--bg-sidebar); border: 1px solid var(--border-color); border-radius: var(--radius); box-shadow: 0 10px 40px rgba(0,0,0,0.8); z-index: 4000; flex-direction: column; overflow: hidden; }
+    .admin-panel.open { display: flex; }
+    .admin-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid var(--border-color); background: var(--bg-card); }
+    .admin-header h2 { font-size: 1.3rem; color: #faa61a; }
+    .admin-tabs { display: flex; border-bottom: 1px solid var(--border-color); background: var(--bg-card); }
+    .admin-tab { flex: 1; padding: 1rem; text-align: center; cursor: pointer; color: var(--text-muted); font-weight: 500; border-bottom: 2px solid transparent; transition: 0.2s; }
+    .admin-tab:hover { background: var(--bg-input); color: var(--text-main); }
+    .admin-tab.active { color: #faa61a; border-bottom-color: #faa61a; }
+    .admin-content { flex: 1; overflow-y: auto; padding: 1.5rem; }
+    .admin-list-item { display: flex; justify-content: space-between; align-items: center; background: var(--bg-input); padding: 1rem; border-radius: 10px; margin-bottom: 0.8rem; border: 1px solid var(--border-color); }
+    .admin-list-item-info { display: flex; flex-direction: column; gap: 0.3rem; overflow: hidden; }
+    .admin-list-item-title { font-weight: 600; font-size: 0.95rem; color: var(--text-main); }
+    .admin-list-item-desc { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 400px; }
+    .admin-login { padding: 3rem; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; height: 100%; }
+    .admin-login input { max-width: 300px; width: 100%; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); padding: 0.8rem; border-radius: 8px; outline: none; text-align: center; }
+
+    /* Настройки */
+    .settings-toggle { position: fixed; bottom: 20px; right: 20px; width: 50px; height: 50px; border-radius: 50%; background: var(--accent); color: white; border: none; font-size: 1.5rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+    .settings-panel { position: fixed; top: 0; right: -350px; width: 320px; height: 100vh; background: var(--bg-sidebar); border-left: 1px solid var(--border-color); padding: 2rem 1.5rem; box-shadow: -5px 0 20px rgba(0,0,0,0.5); z-index: 1001; transition: right 0.3s; overflow-y: auto; }
+    .settings-panel.open { right: 0; }
+    .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+    .settings-header h2 { font-size: 1.3rem; color: var(--text-main); margin: 0; }
+    .close-settings { background: none; border: none; color: var(--text-muted); font-size: 1.5rem; cursor: pointer; }
+    .setting-group { margin-bottom: 1.2rem; }
+    .setting-group label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.3rem; }
+    .setting-group input[type="color"], .setting-group input[type="file"], .setting-group input[type="range"] { width: 100%; padding: 0.4rem; background: var(--bg-input); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px; }
+    .setting-group input[type="color"] { height: 35px; cursor: pointer; }
+    .setting-group input[type="file"] { font-size: 0.8rem; cursor: pointer; }
+
     @media (max-width: 768px) {
       .app-container { flex-direction: column; }
       .sidebar { width: 100%; flex-direction: row; overflow-x: auto; padding: 1rem; border-right: none; border-bottom: 1px solid var(--border-color); align-items: center; }
@@ -323,17 +324,16 @@
 
   <!-- МОДАЛКА ИГРЫ BLOCK BLAST -->
   <div class="modal-overlay" id="gameModal" style="z-index: 5000;">
-    <div class="modal-content" style="max-width: 400px; text-align: center; background: #1a1b1e;">
+    <div class="modal-content" style="max-width: 420px; text-align: center; background: #1a1b1e;">
       <div class="modal-header">
         <h3>🎮 Block Blast</h3>
         <button class="modal-close" id="closeGameModal">×</button>
       </div>
-      <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; color: white; font-weight: bold;">
+      <div style="display: flex; justify-content: space-between; margin-bottom: 1rem; color: white; font-weight: bold; padding: 0 8px;">
         <span>Счёт: <span id="gameScore">0</span></span>
         <span>Рекорд: <span id="gameHighScore">0</span></span>
       </div>
-     <div id="gameGrid"></div>
-      <div id="gamePieces" style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; min-height: 80px;"></div>
+      <div id="gameGrid"></div>
       <div id="gamePieces" style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; min-height: 80px;"></div>
       <button class="btn btn-outline" id="resetGameBtn" style="margin-top: 1rem; width: 100%;">Начать заново</button>
     </div>
@@ -472,7 +472,6 @@
                 return `<iframe class="sc-player" width="100%" height="166" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=${trackUrl}&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"></iframe>`;
             }
             if (spMatch) {
-                // Извлекаем ID трека из ссылки Spotify
                 const trackId = spMatch[1].split('/track/')[1]?.split('?')[0];
                 if (trackId) {
                     return `<iframe class="spotify-player" style="border-radius:12px" src="https://open.spotify.com/embed/track/${trackId}?utm_source=generator&theme=0" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
@@ -1043,9 +1042,6 @@
     // ==========================================
     // ИГРА BLOCK BLAST
     // ==========================================
-       // ==========================================
-    // ИГРА BLOCK BLAST (С ПЕРЕТАСКИВАНИЕМ)
-    // ==========================================
     const gameModal = document.getElementById('gameModal');
     const gameGrid = document.getElementById('gameGrid');
     const gamePieces = document.getElementById('gamePieces');
@@ -1062,7 +1058,6 @@
     
     gameHighScoreEl.textContent = highScore;
 
-    // Открытие игры
     document.getElementById('openGameBtn').addEventListener('click', () => {
         gameModal.classList.add('open');
         setTimeout(() => {
@@ -1085,7 +1080,6 @@
         }
     }
 
-    // Фигуры (все возможные комбинации)
     const shapes = [
         [[1]], [[1,1]], [[1],[1]], 
         [[1,1],[1,1]], [[1,1,1]], [[1],[1],[1]],
@@ -1116,7 +1110,6 @@
                     pieceEl.appendChild(c);
                 });
             });
-            // Используем HTML5 Drag and Drop
             pieceEl.draggable = true;
             pieceEl.dataset.index = index;
             pieceEl.addEventListener('dragstart', handleDragStart);
@@ -1125,11 +1118,10 @@
         });
     }
 
-    // --- Drag & Drop логика ---
     function handleDragStart(e) {
         draggedPiece = currentPieces[this.dataset.index];
         draggedElement = this;
-        e.dataTransfer.setData('text/plain', ''); // Нужно для работы DnD
+        e.dataTransfer.setData('text/plain', '');
         e.dataTransfer.effectAllowed = 'move';
         this.style.opacity = '0.5';
     }
@@ -1141,11 +1133,9 @@
         clearPreview();
     }
 
-    // Обработка перетаскивания над сеткой
     gameGrid.addEventListener('dragover', (e) => {
-        e.preventDefault(); // Разрешаем дроп
+        e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
-        
         const cell = e.target.closest('.game-cell');
         if (cell && draggedPiece) {
             const r = parseInt(cell.dataset.r);
@@ -1167,11 +1157,8 @@
             
             if (canPlace(draggedPiece.shape, r, c)) {
                 placePiece(draggedPiece.shape, r, c);
-                
-                // Удаляем использованную фигуру
                 const index = parseInt(draggedElement.dataset.index);
                 currentPieces.splice(index, 1);
-                
                 renderGrid();
                 renderPieces();
                 checkLines();
@@ -1181,7 +1168,6 @@
         clearPreview();
     });
 
-    // --- Логика игры ---
     function canPlace(shape, row, col) {
         for (let r = 0; r < shape.length; r++) {
             for (let c = 0; c < shape[r].length; c++) {
@@ -1205,11 +1191,9 @@
 
     function checkLines() {
         let cleared = 0;
-        // Проверка строк
         for (let r = 0; r < 8; r++) {
             if (grid[r].every(cell => cell === 1)) { grid[r] = Array(8).fill(0); cleared++; }
         }
-        // Проверка столбцов
         for (let c = 0; c < 8; c++) {
             let full = true;
             for (let r = 0; r < 8; r++) { if (grid[r][c] === 0) { full = false; break; } }
@@ -1223,7 +1207,6 @@
         }
     }
 
-    // Проверка на Game Over (если ни одна фигура не влезает)
     function checkGameOver() {
         if (currentPieces.length === 0) return;
         
@@ -1249,7 +1232,6 @@
         }
     }
 
-    // Подсветка призрака при перетаскивании
     function showPreview(shape, row, col) {
         clearPreview();
         if (!canPlace(shape, row, col)) return;
@@ -1285,3 +1267,13 @@
         renderGrid();
         renderPieces();
     });
+
+    // --- Инициализация ---
+    renderGrid();
+    renderPieces();
+    loadBoards();
+    loadPosts();
+    subscribeToRealtime();
+  </script>
+</body>
+</html>
