@@ -1128,7 +1128,7 @@
         });
     }
 
-        function handleDragStart(e) {
+            function handleDragStart(e) {
         draggedPiece = currentPieces[this.dataset.index];
         draggedElement = this;
         
@@ -1150,17 +1150,6 @@
         
         this.style.opacity = '0.5';
     }
-
-    gameGrid.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
-        const cell = e.target.closest('.game-cell');
-        if (cell && draggedPiece) {
-            const r = parseInt(cell.dataset.r);
-            const c = parseInt(cell.dataset.c);
-            showPreview(draggedPiece.shape, r, c);
-        }
-    });
 
     gameGrid.addEventListener('dragleave', () => {
         clearPreview();
