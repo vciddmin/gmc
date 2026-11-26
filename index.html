@@ -688,6 +688,27 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
     });
     document.getElementById('cancelReply').addEventListener('click', () => { replyModal.classList.remove('open'); replyToPostId = null; });
     document.getElementById('closeReplyModal').addEventListener('click', () => { replyModal.classList.remove('open'); replyToPostId = null; });
+        // --- ВСТАВКА ИЗ БУФЕРА ОБМЕНА (Ctrl+V) ---
+    document.addEventListener('paste', (e) => {
+        // Проверяем, что вставка происходит именно в поле ввода текста
+        if (document.activeElement !== textInput) return;
+
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (let index in items) {
+            const item = items[index];
+            if (item.kind === 'file') {
+                const blob = item.getAsFile();
+                // Проверяем, что это картинка или гифка
+                if (blob.type.startsWith('image/')) {
+                    e.preventDefault(); // Отменяем стандартную вставку текста
+                    pendingFile = blob;
+                    fileLabel.innerHTML = `✅ Вставлено из буфера`;
+                    // Можно сразу отправить или дать юзеру дописать текст
+                    // Для удобства просто прикрепляем файл к отправке
+                }
+            }
+        }
+    });
 
     // --- Realtime ---
     function subscribeToRealtime() {
@@ -793,7 +814,7 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
     }
 
     // УДАЛЕНИЕ БЕЗ CONFIRM
-    window.deletePost = async (id) => {
+        window.deletePost = async (id) => {
         const { error } = await client.from('posts').delete().eq('id', id);
         if (error) alert('Ошибка: ' + error.message);
         else renderAdminContent();
@@ -816,7 +837,6 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
         if (error) alert('Ошибка: ' + error.message);
         else renderAdminContent();
     };
-
     // --- Настройки ---
     const settingsToggle = document.getElementById('settingsToggle');
     const settingsPanel = document.getElementById('settingsPanel');
