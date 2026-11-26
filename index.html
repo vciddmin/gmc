@@ -74,6 +74,7 @@
     .post-text { font-size: 0.95rem; line-height: 1.4; white-space: pre-wrap; word-break: break-word; margin-bottom: 0.5rem; }
     
     .post-image { max-width: 100%; max-height: 400px; border-radius: 8px; margin-top: 0.5rem; display: block; object-fit: contain; }
+    video.post-image { background: #000; }
     
     .post-actions { display: flex; align-items: center; gap: 1rem; font-size: 0.85rem; color: var(--text-muted); }
     .reply-btn { cursor: pointer; color: var(--accent); font-weight: 500; background: none; border: none; padding: 0; font-size: 0.85rem; }
@@ -146,7 +147,7 @@
 <body>
   <div class="app-container" id="appContainer">
     <aside class="sidebar">
-      <div class="sidebar-logo"><span></span>vomit.gmc</div>
+      <div class="sidebar-logo">vomit.gmc</div>
       <div class="board-list" id="boardList"></div>
       <button class="add-board-btn" id="addBoardBtn">+ Создать ветку</button>
     </aside>
@@ -171,13 +172,13 @@
         <form id="postForm">
           <div class="form-row">
             <input type="text" id="authorInput" placeholder="Аноним (или ваш ник)" maxlength="30" autocomplete="off">
-            <textarea id="textInput" placeholder="Введите сообщение... Используйте @gif или @pic для поиска медиа." required></textarea>
+            <textarea id="textInput" placeholder="Введите сообщение... Используйте @gif или @pic для поиска медиа. Можно вставить фото/видео через Ctrl+V." required></textarea>
           </div>
           <div class="form-actions">
             <div class="media-btns">
               <label class="file-label" id="fileLabel">
                 📎 Файл
-                <input type="file" id="fileInput" class="file-input" accept="image/*,video/*,gif/*">
+                <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
               </label>
               <button type="button" class="media-btn" id="openGifSearch">@gif</button>
               <button type="button" class="media-btn" id="openPicSearch">@pic</button>
@@ -306,12 +307,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // =========================================================
-    // ⚠️ ВСТАВЬ СВОИ КЛЮЧИ ЗДЕСЬ
+    // КЛЮЧИ И НАСТРОЙКИ
     // =========================================================
     const SUPABASE_URL = 'https://ixeckrmjjwfaghcrmiep.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_1gEN4w23ZxnYOosQ92_zGw_5oFocx6z'; // <--- Твой ключ Supabase
-const GIPHY_API_KEY = 'aiNLKrZ1xjoCGIyCjUoxfGrtAHI5W1w2'; // <--- Вставь ключ Giphy
-const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <--- Вставь ключ Unsplash (если есть)
+    const SUPABASE_ANON_KEY = 'sb_publishable_1gEN4w23ZxnYOosQ92_zGw_5oFocx6z'; 
+    const GIPHY_API_KEY = 'aiNLKrZ1xjoCGIyCjUoxfGrtAHI5W1w2'; 
+    const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; 
     
     // СЕКРЕТНЫЙ КОД ДЛЯ АДМИНКИ
     const ADMIN_PASSWORD = 'sigil_master_666'; 
@@ -360,12 +361,17 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
 
     function renderTextWithImages(text) {
         if (!text) return '';
-        const parts = text.split(/(\[img\].*?\[\/img\])/g);
+        const parts = text.split(/(\[img\].*?\[\/img\]|\[video\].*?\[\/video\])/g);
         return parts.map(part => {
-            const match = part.match(/\[img\](.*?)\[\/img\]/);
-            if (match) {
-                const url = match[1];
+            const imgMatch = part.match(/\[img\](.*?)\[\/img\]/);
+            const videoMatch = part.match(/\[video\](.*?)\[\/video\]/);
+            
+            if (imgMatch) {
+                const url = imgMatch[1];
                 return `<img src="${url}" class="post-image" alt="media" loading="lazy">`;
+            } else if (videoMatch) {
+                const url = videoMatch[1];
+                return `<video src="${url}" class="post-image" controls style="max-height: 400px; background: #000;"></video>`;
             } else {
                 return escapeHTML(part).replace(/\n/g, '<br>');
             }
@@ -634,21 +640,52 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
         }
     });
 
+    // --- ВСТАВКА ИЗ БУФЕРА ОБМЕНА (Ctrl+V) ---
+    document.addEventListener('paste', (e) => {
+        if (document.activeElement !== textInput) return;
+
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (let index in items) {
+            const item = items[index];
+            if (item.kind === 'file') {
+                const blob = item.getAsFile();
+                if (blob.type.startsWith('image/') || blob.type.startsWith('video/')) {
+                    e.preventDefault();
+                    pendingFile = blob;
+                    fileLabel.innerHTML = `✅ Вставлено из буфера`;
+                }
+            }
+        }
+    });
+
     // --- Отправка поста ---
     postForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const author = authorInput.value.trim() || 'Аноним';
       let text = textInput.value.trim();
+      
       if (!text && !pendingFile) return;
+
       submitBtn.disabled = true;
       submitBtn.textContent = 'Отправка...';
+
       let mediaUrl = null;
+      let isVideo = false;
+
       if (pendingFile) {
           try {
-              const fileExt = pendingFile.name.split('.').pop();
+              if (pendingFile.type.startsWith('video/')) {
+                  isVideo = true;
+              }
+
+              const fileExt = pendingFile.name.split('.').pop() || (isVideo ? 'mp4' : 'jpg');
               const fileName = `${Date.now()}.${fileExt}`;
               const filePath = `uploads/${fileName}`;
-              const { data, error } = await client.storage.from('media').upload(filePath, pendingFile, { cacheControl: '3600', upsert: false });
+
+              const { data, error } = await client.storage
+                  .from('media')
+                  .upload(filePath, pendingFile, { cacheControl: '3600', upsert: false });
+
               if (error) throw error;
               const { data: { publicUrl } } = client.storage.from('media').getPublicUrl(filePath);
               mediaUrl = publicUrl;
@@ -659,9 +696,15 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
               return;
           }
       }
+
       let finalText = text;
-      if (mediaUrl) finalText = (finalText ? finalText + '\n' : '') + `[img]${mediaUrl}[/img]`;
+      if (mediaUrl) {
+          const marker = isVideo ? 'video' : 'img';
+          finalText = (finalText ? finalText + '\n' : '') + `[${marker}]${mediaUrl}[/${marker}]`;
+      }
+
       const { error } = await client.from('posts').insert([{ author, text: finalText, board: currentBoard, parent_id: null }]);
+      
       if (error) {
         document.getElementById('errorBox').innerHTML = `<div class="error-msg">Ошибка: ${error.message}</div>`;
       } else {
@@ -688,27 +731,6 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
     });
     document.getElementById('cancelReply').addEventListener('click', () => { replyModal.classList.remove('open'); replyToPostId = null; });
     document.getElementById('closeReplyModal').addEventListener('click', () => { replyModal.classList.remove('open'); replyToPostId = null; });
-        // --- ВСТАВКА ИЗ БУФЕРА ОБМЕНА (Ctrl+V) ---
-    document.addEventListener('paste', (e) => {
-        // Проверяем, что вставка происходит именно в поле ввода текста
-        if (document.activeElement !== textInput) return;
-
-        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-        for (let index in items) {
-            const item = items[index];
-            if (item.kind === 'file') {
-                const blob = item.getAsFile();
-                // Проверяем, что это картинка или гифка
-                if (blob.type.startsWith('image/')) {
-                    e.preventDefault(); // Отменяем стандартную вставку текста
-                    pendingFile = blob;
-                    fileLabel.innerHTML = `✅ Вставлено из буфера`;
-                    // Можно сразу отправить или дать юзеру дописать текст
-                    // Для удобства просто прикрепляем файл к отправке
-                }
-            }
-        }
-    });
 
     // --- Realtime ---
     function subscribeToRealtime() {
@@ -813,8 +835,7 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
         }
     }
 
-    // УДАЛЕНИЕ БЕЗ CONFIRM
-        window.deletePost = async (id) => {
+    window.deletePost = async (id) => {
         const { error } = await client.from('posts').delete().eq('id', id);
         if (error) alert('Ошибка: ' + error.message);
         else renderAdminContent();
@@ -837,6 +858,7 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
         if (error) alert('Ошибка: ' + error.message);
         else renderAdminContent();
     };
+
     // --- Настройки ---
     const settingsToggle = document.getElementById('settingsToggle');
     const settingsPanel = document.getElementById('settingsPanel');
