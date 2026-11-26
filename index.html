@@ -203,12 +203,16 @@
     </div>
   </div>
 
-  <!-- Модалка ответа -->
+  <!-- Модалка ответа (С ИСПРАВЛЕННЫМ НИКОМ) -->
   <div class="modal-overlay" id="replyModal">
     <div class="modal-content">
-      <h3>Ответ на пост</h3>
-      <textarea class="modal-search-input" id="replyText" style="min-height: 80px; resize: vertical;" placeholder="Ваш ответ..."></textarea>
-      <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1rem;">
+      <div class="modal-header">
+        <h3>Ответ на пост</h3>
+        <button class="modal-close" id="closeReplyModal">×</button>
+      </div>
+      <input type="text" id="replyAuthorInput" class="modal-search-input" placeholder="Аноним (или ваш ник)" style="margin-bottom: 0.5rem;" maxlength="30">
+      <textarea class="modal-search-input" id="replyText" style="min-height: 80px; resize: vertical; margin-bottom: 1rem;" placeholder="Ваш ответ..."></textarea>
+      <div style="display: flex; justify-content: flex-end; gap: 0.5rem;">
         <button class="btn btn-outline" id="cancelReply">Отмена</button>
         <button class="btn btn-primary" id="submitReply">Ответить</button>
       </div>
@@ -430,6 +434,7 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
         btn.addEventListener('click', (e) => {
           replyToPostId = e.target.dataset.id;
           replyModal.classList.add('open');
+          document.getElementById('replyAuthorInput').value = authorInput.value.trim(); // Подставляем ник
           replyText.focus();
         });
       });
@@ -649,12 +654,15 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
       submitBtn.textContent = 'Отправить';
     });
 
+    // --- Отправка ответа ---
     document.getElementById('submitReply').addEventListener('click', async () => {
       const text = replyText.value.trim();
+      const author = document.getElementById('replyAuthorInput').value.trim() || 'Аноним';
+      
       if (!text || !replyToPostId) return;
 
       const { error } = await client.from('posts').insert([{ 
-        author: 'Аноним', 
+        author: author, 
         text, 
         board: currentBoard, 
         parent_id: replyToPostId 
@@ -664,10 +672,16 @@ const UNSPLASH_ACCESS_KEY = 'sy7RR1DuYgM0wMWVHjEnpJUMQooSd79L4iWL8BjtS7Q'; // <-
       
       replyModal.classList.remove('open');
       replyText.value = '';
+      document.getElementById('replyAuthorInput').value = '';
       replyToPostId = null;
     });
 
     document.getElementById('cancelReply').addEventListener('click', () => {
+      replyModal.classList.remove('open');
+      replyToPostId = null;
+    });
+
+    document.getElementById('closeReplyModal').addEventListener('click', () => {
       replyModal.classList.remove('open');
       replyToPostId = null;
     });
