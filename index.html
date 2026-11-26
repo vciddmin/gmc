@@ -1128,25 +1128,27 @@
         });
     }
 
-    function handleDragStart(e) {
+        function handleDragStart(e) {
         draggedPiece = currentPieces[this.dataset.index];
         draggedElement = this;
         
+        // Создаем невидимую картинку 1x1 пиксель
         const img = new Image();
         img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
         
         e.dataTransfer.setData('text/plain', '');
         e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setDragImage(img, 20, 20);
+        
+        // ВЫЧИСЛЯЕМ ЦЕНТР ФИГУРЫ
+        // Берем ширину/высоту элемента, делим пополам и вычитаем половину ячейки (11px)
+        const rect = this.getBoundingClientRect();
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        // Устанавливаем точку захвата ровно в центр
+        e.dataTransfer.setDragImage(img, centerX, centerY);
         
         this.style.opacity = '0.5';
-    }
-
-    function handleDragEnd(e) {
-        this.style.opacity = '1';
-        draggedPiece = null;
-        draggedElement = null;
-        clearPreview();
     }
 
     gameGrid.addEventListener('dragover', (e) => {
