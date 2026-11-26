@@ -339,6 +339,16 @@
     </div>
   </div>
 
+  <!-- МОДАЛКА ПРОИГРЫША -->
+  <div class="modal-overlay" id="gameOverModal" style="z-index: 6000;">
+    <div class="modal-content" style="max-width: 300px; text-align: center; background: #1a1b1e; padding: 2rem;">
+      <h2 style="color: #ed4245; margin-bottom: 1rem;">Игра окончена!</h2>
+      <p style="font-size: 1.2rem; margin-bottom: 0.5rem; color: white;">Твой счёт:</p>
+      <p style="font-size: 2rem; font-weight: bold; color: var(--accent); margin-bottom: 1.5rem;" id="finalScoreDisplay">0</p>
+      <button class="btn btn-primary" id="gameOverRestartBtn" style="width: 100%;">Играть снова</button>
+    </div>
+  </div>
+
   <!-- АДМИН ПАНЕЛЬ -->
   <button class="admin-toggle" id="adminToggle" title="Админ-панель">🔑</button>
   <div class="admin-panel" id="adminPanel">
@@ -1121,8 +1131,14 @@
     function handleDragStart(e) {
         draggedPiece = currentPieces[this.dataset.index];
         draggedElement = this;
+        
+        const img = new Image();
+        img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+        
         e.dataTransfer.setData('text/plain', '');
         e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setDragImage(img, 20, 20);
+        
         this.style.opacity = '0.5';
     }
 
@@ -1225,12 +1241,21 @@
         }
         
         if (!canPlaceAny) {
-            setTimeout(() => {
-                alert(`Игра окончена! Твой счёт: ${score}`);
-                resetGameBtn.click();
-            }, 100);
+            document.getElementById('finalScoreDisplay').textContent = score;
+            document.getElementById('gameOverModal').classList.add('open');
         }
     }
+
+    document.getElementById('gameOverRestartBtn').addEventListener('click', () => {
+        document.getElementById('gameOverModal').classList.remove('open');
+        resetGameBtn.click();
+    });
+    document.getElementById('gameOverModal').addEventListener('click', (e) => {
+        if (e.target.id === 'gameOverModal') {
+            document.getElementById('gameOverModal').classList.remove('open');
+            resetGameBtn.click();
+        }
+    });
 
     function showPreview(shape, row, col) {
         clearPreview();
